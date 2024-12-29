@@ -908,22 +908,16 @@ Definição do tipo:
 \emph{Monad}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{9}{@{}>{\hspre}c<{\hspost}@{}}%
 \column{9E}{@{}l@{}}%
 \column{12}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\mathbf{instance}\;\Conid{Functor}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
+\>[B]{}\mathbf{instance}\;\Conid{Functor}\;(\Conid{Expr}\;\Varid{b}){}\<[E]%
 \\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mathsf{fmap}\;\Varid{f}\;(\Conid{V}\;\Varid{a})\mathrel{=}\Conid{V}\;(\Varid{f}\;\Varid{a}){}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mathsf{fmap}\;\anonymous \;(\Conid{N}\;\Varid{b})\mathrel{=}\Conid{N}\;\Varid{b}{}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mathsf{fmap}\;\Varid{f}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}\Conid{T}\;\Varid{op}\;(\map \;(\mathsf{fmap}\;\Varid{f})\;\Varid{exprs}){}\<[E]%
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\mathbf{where}\;\mathsf{fmap}\;\Varid{f}\mathrel{=}\Varid{cataExpr}\;(\Varid{inExpr}\comp \Varid{baseExpr}\;\Varid{f}\;\Varid{id}\;\Varid{id}){}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\mathbf{instance}\;\Conid{Applicative}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
 \\

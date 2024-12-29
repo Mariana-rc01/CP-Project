@@ -39,10 +39,8 @@ hyloExpr h g = cataExpr h . anaExpr g
 
 -- (3) Monad -------------------------------------------------------------------
 
-instance Functor (Expr b) where
-  fmap f (V a) = V (f a)
-  fmap _ (N b) = N b
-  fmap f (T op exprs) = T op (map (fmap f) exprs)
+instance Functor (Expr b)
+     where fmap f = cataExpr (inExpr . baseExpr f id id)
 
 instance Applicative (Expr b) where
     pure :: a -> Expr b a
