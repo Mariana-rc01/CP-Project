@@ -119,10 +119,10 @@
 
 %====== DEFINIR GRUPO E ELEMENTOS =============================================%
 
-\group{G99}
-\studentA{xxxxxx}{Nome }
-\studentB{xxxxxx}{Nome }
-\studentC{xxxxxx}{Nome }
+\group{G2}
+\studentA{104356}{João d'Araújo Dias Lobo }
+\studentB{90817}{Mariana Rocha Cristino }
+\studentC{104439}{Rita da Cunha Camacho }
 
 %==============================================================================%
 
@@ -162,7 +162,7 @@ e elegantes que utilizem os combinadores de ordem superior estudados na discipli
 %if False
 \begin{code}
 {-# OPTIONS_GHC -XNPlusKPatterns #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveDataTypeable, FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveDataTypeable, FlexibleInstances, UndecidableInstances #-}
 module Main where
 import Cp
 import List hiding (fac)
@@ -632,17 +632,57 @@ convolve = undefined
 \subsection*{Problema 4}
 Definição do tipo:
 \begin{code}
-outExpr = undefined
 
-recExpr = undefined
+outExpr :: Expr b a -> Either a (Either b (Op, [Expr b a]))
+outExpr (V n) = i1 n
+outExpr (N n) = (i2.i1) n
+outExpr (T op exprs) = (i2.i2) (op,exprs)
+
+recExpr :: (a -> b1) -> Either b2 (Either b3 (b4, [a])) -> Either b2 (Either b3 (b4, [b1]))
+recExpr = baseExpr id id
+
 \end{code}
 \emph{Ana + cata + hylo}:
 \begin{code}
-cataExpr g = undefined
 
-anaExpr g = undefined
+cataExpr :: (Either b2 (Either b3 (Op, [b1])) -> b1) -> Expr b3 b2 -> b1
+cataExpr g = g . recExpr (cataExpr g) . outExpr
+
+anaExpr :: (a1 -> Either a2 (Either b (Op, [a1]))) -> a1 -> Expr b a2
+anaExpr g = inExpr . recExpr (anaExpr g) . g
                 
-hyloExpr h g = undefined
+hyloExpr :: (Either b2 (Either b3 (Op, [c])) -> c) -> (a -> Either b2 (Either b3 (Op, [a]))) -> a -> c
+hyloExpr h g = cataExpr h . anaExpr g
+
+\end{code}
+\emph{Monad}:
+\begin{code}
+
+instance Functor (Expr b) where
+  fmap f (V a) = V (f a)
+  fmap _ (N b) = N b
+  fmap f (T op exprs) = T op (map (fmap f) exprs)
+
+instance Applicative (Expr b) where
+    pure :: a -> Expr b a
+    pure = V
+    (V f) <*> x = fmap f x
+    (N b) <*> _ = N b
+    (T op fs) <*> x = T op (map (<*> x) fs)
+
+instance Monad (Expr b) where
+    return :: a -> Expr b a
+    return = pure
+
+    (>>=) :: Expr b a -> (a -> Expr b b1) -> Expr b b1
+    t >>= g = muExpr (fmap g t)
+
+muExpr :: Expr b (Expr b a) -> Expr b a
+muExpr  =  cataExpr (either id (inExpr . i2))
+
+u :: a -> Expr b a
+u = V
+
 \end{code}
 \emph{Maps}:
 \emph{Monad}:
