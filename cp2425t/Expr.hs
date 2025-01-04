@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-noncanonical-monad-instances #-}
+{-# HLINT ignore "Use camelCase" #-}
 
 module Expr where
 import Cp
@@ -66,3 +67,11 @@ u = V
 e = ite (V "x") (N 0) (multi (V "y") (soma (N 3) (V "y")))
 i = ite (V "x") (N 1) (multi (V "y") (soma (N (3 % 5)) (V "y")))
 
+let_exp :: (Num c) => (a -> Expr c b) -> Expr c a -> Expr c b
+let_exp f = cataExpr (either f (either N (uncurry T)))
+
+f "x" = N 0
+f "y" = N 5
+f _ = N 99
+
+-- let_exp f e = T ITE [N 0, N 0, T Mul [N 5, T Add [N 3, N 5]]]

@@ -967,7 +967,7 @@ Definição do tipo:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{let\char95 exp}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{let\char95 exp}\;\Varid{f}\mathrel{=}\Varid{cataExpr}\;\alt{\Varid{f}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 Catamorfismo monádico:

@@ -686,7 +686,7 @@ u = V
 \emph{Monad}:
 \emph{Let expressions}:
 \begin{code}
-let_exp = undefined
+let_exp f = cataExpr (either f (either N (uncurry T)))
 \end{code}
 Catamorfismo monádico:
 \begin{code}
