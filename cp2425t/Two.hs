@@ -1,5 +1,6 @@
 {-# LANGUAGE NPlusKPatterns #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
 
 module Two where
 import List
@@ -21,6 +22,7 @@ primes = anaList g
 
 -- 2.2
 
+-- 1ª resolução
 -- mergeTrees
 mergeTrees :: (Exp Integer Integer, Exp Integer Integer) -> Exp Integer Integer
 mergeTrees (Var v1, Var v2) = Term 1 [Var v1, Var v2]
@@ -56,9 +58,13 @@ geneAna :: [Integer] -> Either () (Exp Integer Integer, [Integer])
 geneAna [] = i1 ()
 geneAna (x:xs) = i2 (primeTree x, xs)
 
-prime_tree :: [Integer] -> Exp Integer Integer
-prime_tree = hyloList geneCata geneAna
+prime_tree' :: [Integer] -> Exp Integer Integer
+prime_tree' = hyloList geneCata geneAna
 
 -- l = prime_tree [455, 669, 6645, 34, 12, 2]
---Term 1 [Term 5 [Term 7 [Term 13 [Var 455]], Term 3 [Term 223 [Var 669], Term 5 [Term 443 [Var 6645]]], Term 2 [Term 17 [Var 34], Term 2 [Term 3 [Var 12]], Var 2]]]
 -- pict l
+-- Term 1 [Term 5 [Term 7 [Term 13 [Var 455]]],Term 3 [Term 223 [Var 669],Term 5 [Term 443 [Var 6645]]],Term 2 [Term 17 [Var 34],Term 2 [Term 3 [Var 12]],Var 2]]
+
+-- 2ª resolução
+prime_tree :: [Integer] -> Exp Integer Integer
+prime_tree = Term 1 . untar . map (\n -> (primes n, n))
