@@ -787,75 +787,8 @@ Primeira parte:
 Segunda parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\mbox{\onelinecomment  mergeTrees}{}\<[E]%
-\\
-\>[B]{}\Varid{mergeTrees}\mathbin{::}(\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z},\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z})\to \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}{}\<[E]%
-\\
-\>[B]{}\Varid{mergeTrees}\;(\Conid{Var}\;\Varid{v1},\Conid{Var}\;\Varid{v2})\mathrel{=}\Conid{Term}\;\mathrm{1}\;[\mskip1.5mu \Conid{Var}\;\Varid{v1},\Conid{Var}\;\Varid{v2}\mskip1.5mu]{}\<[E]%
-\\
-\>[B]{}\Varid{mergeTrees}\;(\Conid{Var}\;\Varid{v},\Conid{Term}\;\Varid{o}\;\Varid{sub})\mathrel{=}\Conid{Term}\;\Varid{o}\;(\Conid{Var}\;\Varid{v}\mathbin{:}\Varid{sub}){}\<[E]%
-\\
-\>[B]{}\Varid{mergeTrees}\;(\Conid{Term}\;\Varid{o}\;\Varid{sub},\Conid{Var}\;\Varid{v})\mathrel{=}\Conid{Term}\;\Varid{o}\;(\Varid{sub}\mathbin{+\!\!+}[\mskip1.5mu \Conid{Var}\;\Varid{v}\mskip1.5mu]){}\<[E]%
-\\
-\>[B]{}\Varid{mergeTrees}\;(\Conid{Term}\;\Varid{o1}\;\Varid{sub1},\Conid{Term}\;\Varid{o2}\;\Varid{sub2}){}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mid \Varid{o1}\equiv \Varid{o2}\mathrel{=}\Conid{Term}\;\Varid{o1}\;(\Varid{mergeSubtrees}\;\Varid{sub1}\;\Varid{sub2}){}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mid \Varid{otherwise}\mathrel{=}\Conid{Term}\;\mathrm{1}\;[\mskip1.5mu \Conid{Term}\;\Varid{o1}\;\Varid{sub1},\Conid{Term}\;\Varid{o2}\;\Varid{sub2}\mskip1.5mu]{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{mergeSubtrees}\mathbin{::}[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]\to [\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]\to [\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]{}\<[E]%
-\\
-\>[B]{}\Varid{mergeSubtrees}\;[\mskip1.5mu \mskip1.5mu]\;\Varid{t2}\mathrel{=}\Varid{t2}{}\<[E]%
-\\
-\>[B]{}\Varid{mergeSubtrees}\;\Varid{t1}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}\Varid{t1}{}\<[E]%
-\\
-\>[B]{}\Varid{mergeSubtrees}\;(\Varid{x}\mathbin{:}\Varid{xs})\;\Varid{ys}\mathrel{=}{}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mathbf{case}\;\Varid{find}\;(\Varid{sameRoot}\;\Varid{x})\;\Varid{ys}\;\mathbf{of}{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Conid{Just}\;\Varid{y}\to \Varid{mergeTrees}\;(\Varid{x},\Varid{y})\mathbin{:}\Varid{mergeSubtrees}\;\Varid{xs}\;(\Varid{filter}\;(\not\equiv \Varid{y})\;\Varid{ys}){}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Conid{Nothing}\to \Varid{x}\mathbin{:}\Varid{mergeSubtrees}\;\Varid{xs}\;\Varid{ys}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\mbox{\onelinecomment  Checks if two trees have the same root}{}\<[E]%
-\\
-\>[B]{}\Varid{sameRoot}\mathbin{::}\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\to \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\to \Conid{Bool}{}\<[E]%
-\\
-\>[B]{}\Varid{sameRoot}\;(\Conid{Term}\;\Varid{o1}\;\anonymous )\;(\Conid{Term}\;\Varid{o2}\;\anonymous )\mathrel{=}\Varid{o1}\equiv \Varid{o2}{}\<[E]%
-\\
-\>[B]{}\Varid{sameRoot}\;\anonymous \;\anonymous \mathrel{=}\Conid{False}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\mbox{\onelinecomment  Generate a tree with a prime number as root and its prime factors as children}{}\<[E]%
-\\
-\>[B]{}\Varid{primeTree}\mathbin{::}\mathbb{Z}\to \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}{}\<[E]%
-\\
-\>[B]{}\Varid{primeTree}\;\Varid{n}\mathrel{=}\Conid{Term}\;\mathrm{1}\;(\Varid{myfoldr}\;\Varid{buildTree}\;[\mskip1.5mu \Conid{Var}\;\Varid{n}\mskip1.5mu]\;(\Varid{primes}\;\Varid{n})){}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mathbf{where}{}\<[E]%
-\\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{buildTree}\;\Varid{prime}\;\Varid{acc}\mathrel{=}[\mskip1.5mu \Conid{Term}\;\Varid{prime}\;\Varid{acc}\mskip1.5mu]{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{geneCata}\mathbin{::}()+(\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z},\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z})\to \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}{}\<[E]%
-\\
-\>[B]{}\Varid{geneCata}\mathrel{=}\alt{\underline{\Conid{Term}\;\mathrm{1}\;[\mskip1.5mu \mskip1.5mu]}}{\Varid{mergeTrees}}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{geneAna}\mathbin{::}[\mskip1.5mu \mathbb{Z}\mskip1.5mu]\to ()+(\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z},[\mskip1.5mu \mathbb{Z}\mskip1.5mu]){}\<[E]%
-\\
-\>[B]{}\Varid{geneAna}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}i_1\;(){}\<[E]%
-\\
-\>[B]{}\Varid{geneAna}\;(\Varid{x}\mathbin{:}\Varid{xs})\mathrel{=}i_2\;(\Varid{primeTree}\;\Varid{x},\Varid{xs}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{prime\char95 tree}\mathrel{=}\Varid{hyloList}\;\Varid{geneCata}\;\Varid{geneAna}{}\<[E]%
+\>[B]{}\Varid{prime\char95 tree}\mathrel{=}\Conid{Term}\;\mathrm{1}\comp \Varid{untar}\comp \map \;(\lambda \Varid{n}\to (\Varid{primes}\;\Varid{n},\Varid{n})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
