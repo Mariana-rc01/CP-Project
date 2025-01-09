@@ -64,8 +64,14 @@ mu  =  cataExpr (either id (inExpr . i2))
 u :: a -> Expr b a
 u = V
 
+-- Monadic cata
+
 mcataExpr :: Monad m => (Either a (Either b (Op, m [c])) -> m c) -> Expr b a -> m c
-mcataExpr g = undefined
+mcataExpr g = g .! (dl . recExpr (mcataExpr g) . outExpr)
+
+dl :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
+dl = either (return . i1) (either (return . i2 . i1) aux)
+    where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
 
 -- Exemplos
 e = ite (V "x") (N 0) (multi (V "y") (soma (N 3) (V "y")))
@@ -114,5 +120,3 @@ g "x" = N 0
 g "y" = N (1%7)
 
 -- let_exp f e = T ITE [N 0, N 0, T Mul [N 5, T Add [N 3, N 5]]]
-
-
