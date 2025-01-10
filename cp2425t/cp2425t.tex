@@ -759,8 +759,34 @@ que sejam necessárias.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{hindex}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{hindex}\mathrel{=}\Varid{hyloBTree}\;\alt{\Varid{f1}}{\Varid{f2}}\;\Varid{qsep}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{f1}\mathrel{=}\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{f2}\mathbin{::}(\Conid{Int},((\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu]),(\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu])))\to (\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu]){}\<[E]%
+\\
+\>[B]{}\Varid{f2}\;(\Varid{n},((\anonymous ,\Varid{ll}),(\anonymous ,\Varid{lr})))\mathrel{=}(\Varid{hIndex},\Varid{contributors}){}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mathbf{where}{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{list}\mathrel{=}\Varid{lr}\mathbin{+\!\!+}[\mskip1.5mu \Varid{n}\mskip1.5mu]\mathbin{+\!\!+}\Varid{ll}{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{hIndex}\mathrel{=}\Varid{myfoldr}\;\overline{\Varid{process}}\;\mathrm{0}\;(\Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu]\;\Varid{list}){}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{process}\mathbin{::}(\Conid{Ord}\;\Varid{a})\Rightarrow ((\Varid{a},\Varid{a}),\Varid{a})\to \Varid{a}{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{process}\mathrel{=}\Varid{cond}\;(\uncurry{(\geq )}\comp \Varid{swap}\comp \p1)\;(\uncurry{\Varid{max}}\comp \Varid{swap}\comp (\p1\times\Varid{id}))\;\p2{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{contributors}\mathrel{=}\Varid{filter}\;(\geq \Varid{hIndex})\;\Varid{list}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -768,18 +794,16 @@ que sejam necessárias.
 Primeira parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{38}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{smallestPrimeFactor}\mathbin{::}(\mathbb{Z},\mathbb{Z})\to \mathbb{Z}{}\<[E]%
+\>[B]{}\Varid{smallestPrimeFactor}\;\Varid{x}\mathrel{=}\for{\lambda \Varid{n}\to \Varid{cond}\;(\uncurry{(\mathbin{>})}\comp ((\mathbin{\uparrow}\mathrm{2})\times\Varid{id}))\;\p2\;{}\<[E]%
 \\
-\>[B]{}\Varid{smallestPrimeFactor}\mathrel{=}\Varid{cond}\;(\uncurry{(\mathbin{>})}\comp ((\mathbin{\uparrow}\mathrm{2})\times\Varid{id}))\;\p2{}\<[E]%
-\\
-\>[B]{}\hsindent{7}{}\<[7]%
-\>[7]{}(\Varid{cond}\;((\equiv \mathrm{0})\comp \uncurry{\Varid{mod}}\comp \Varid{swap})\;\p1\;(\Varid{smallestPrimeFactor}\comp (\succ \times\Varid{id}))){}\<[E]%
+\>[B]{}\hsindent{38}{}\<[38]%
+\>[38]{}(\Varid{cond}\;((\equiv \mathrm{0})\comp \uncurry{\Varid{mod}}\comp \Varid{swap})\;\p1\;(\succ \comp \p1))\;(\Varid{n},\Varid{x})}\ {\mathrm{2}}\;\Varid{x}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{g}\;\mathrm{1}\mathrel{=}i_1\;(){}\<[E]%
 \\
-\>[B]{}\Varid{g}\;\Varid{n}\mathrel{=}i_2\;(\Varid{smallestPrimeFactor}\;(\mathrm{2},\Varid{n}),\Varid{n}\div \Varid{smallestPrimeFactor}\;(\mathrm{2},\Varid{n})){}\<[E]%
+\>[B]{}\Varid{g}\;\Varid{n}\mathrel{=}i_2\;(\Varid{smallestPrimeFactor}\;\Varid{n},\Varid{n}\div \Varid{smallestPrimeFactor}\;\Varid{n}){}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{primes}\mathrel{=}\anaList{\Varid{g}}{}\<[E]%
 \ColumnHook
@@ -825,16 +849,10 @@ Definição do tipo:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{cataExpr}\mathbin{::}(\Varid{b2}+(\Varid{b3}+(\Conid{Op},[\mskip1.5mu \Varid{b1}\mskip1.5mu]))\to \Varid{b1})\to \Conid{Expr}\;\Varid{b3}\;\Varid{b2}\to \Varid{b1}{}\<[E]%
-\\
 \>[B]{}\Varid{cataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\comp \Varid{recExpr}\;(\Varid{cataExpr}\;\Varid{g})\comp \Varid{outExpr}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{anaExpr}\mathbin{::}(\Varid{a1}\to \Varid{a2}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Varid{a1}\mskip1.5mu])))\to \Varid{a1}\to \Conid{Expr}\;\Varid{b}\;\Varid{a2}{}\<[E]%
-\\
 \>[B]{}\Varid{anaExpr}\;\Varid{g}\mathrel{=}\Varid{inExpr}\comp \Varid{recExpr}\;(\Varid{anaExpr}\;\Varid{g})\comp \Varid{g}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{hyloExpr}\mathbin{::}(\Varid{b2}+(\Varid{b3}+(\Conid{Op},[\mskip1.5mu \Varid{c}\mskip1.5mu]))\to \Varid{c})\to (\Varid{a}\to \Varid{b2}+(\Varid{b3}+(\Conid{Op},[\mskip1.5mu \Varid{a}\mskip1.5mu])))\to \Varid{a}\to \Varid{c}{}\<[E]%
-\\
 \>[B]{}\Varid{hyloExpr}\;\Varid{h}\;\Varid{g}\mathrel{=}\Varid{cataExpr}\;\Varid{h}\comp \Varid{anaExpr}\;\Varid{g}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
@@ -906,15 +924,50 @@ Definição do tipo:
 Catamorfismo monádico:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{mcataExpr}\;\Varid{g}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{mcataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\mathbin{.!}(\Varid{dl'}\comp \Varid{recExpr}\;(\Varid{mcataExpr}\;\Varid{g})\comp \Varid{outExpr}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{dl'}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{a}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]))\to \Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]))){}\<[E]%
+\\
+\>[B]{}\Varid{dl'}\mathrel{=}\alt{\Varid{return}\comp i_1}{\alt{\Varid{return}\comp i_2\comp i_1}{\Varid{aux}}}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mathbf{where}\;\Varid{aux}\;(\Varid{op},\Varid{ms})\mathrel{=}\mathbf{do}\;\Varid{m}\leftarrow \Varid{lamb}\;\Varid{ms};(\Varid{return}\comp i_2\comp i_2)\;(\Varid{op},\Varid{return}\;\Varid{m}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 Avaliação de expressões:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{evaluate}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{evaluate}\mathrel{=}\Varid{mcataExpr}\;\Varid{gene}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{gene}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Varid{b}+(\Varid{a}+(\Conid{Op},\Conid{Maybe}\;[\mskip1.5mu \Varid{a}\mskip1.5mu]))\to \Conid{Maybe}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{gene}\mathrel{=}\alt{\underline{\Conid{Nothing}}}{\alt{\Conid{Just}}{\Varid{aux}}}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mathbf{where}\;\Varid{aux}\;(\Varid{op},\Varid{args})\mathrel{=}\mathbf{do}\;\Varid{argsR}\leftarrow \Varid{args};\Varid{result}\;\Varid{op}\;\Varid{argsR}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{result}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Conid{Op}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Maybe}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{result}\;\Conid{Add}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\Varid{y}){}\<[E]%
+\\
+\>[B]{}\Varid{result}\;\Conid{Mul}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{*}\Varid{y}){}\<[E]%
+\\
+\>[B]{}\Varid{result}\;\Conid{Suc}\;[\mskip1.5mu \Varid{x}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\mathrm{1}){}\<[E]%
+\\
+\>[B]{}\Varid{result}\;\Conid{ITE}\;[\mskip1.5mu \Varid{cond},\Varid{t},\Varid{f}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mid \Varid{cond}\mathbin{>}\mathrm{0}\mathrel{=}\Conid{Just}\;\Varid{t}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mid \Varid{otherwise}\mathrel{=}\Conid{Just}\;\Varid{f}{}\<[E]%
+\\
+\>[B]{}\Varid{result}\;\anonymous \;\anonymous \mathrel{=}\Conid{Nothing}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

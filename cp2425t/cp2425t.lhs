@@ -180,6 +180,7 @@ import Data.Char
 import Data.Ratio
 import Control.Concurrent
 import Data.List (find)
+import BTree (hyloBTree, qsep)
 
 main = undefined
 \end{code}
@@ -566,19 +567,29 @@ que sejam necessárias.
 \subsection*{Problema 1}
 
 \begin{code}
-hindex = undefined
+hindex = hyloBTree (either f1 f2) qsep
+
+f1 = const (0, [])
+
+f2 :: (Int, ((Int, [Int]), (Int, [Int]))) -> (Int, [Int])
+f2 (n, ((_, ll), (_, lr))) = (hIndex, contributors)
+    where
+        list = lr ++ [n] ++ ll
+        hIndex = myfoldr (curry process) 0 (zip [1..] list)
+        process :: (Ord a) => ((a, a), a) -> a
+        process = cond (uncurry (>=).swap.p1) (uncurry max . swap . (p1 >< id)) p2
+        contributors = filter (>= hIndex) list
 \end{code}
 
 \subsection*{Problema 2}
 Primeira parte:
 \begin{code}
 
-smallestPrimeFactor :: (Integer, Integer) -> Integer
-smallestPrimeFactor = cond (uncurry (>) . ((^2) >< id)) p2
-      (cond ((== 0) . uncurry mod . swap) p1 (smallestPrimeFactor . (succ >< id)))
+smallestPrimeFactor x = for (\n -> cond (uncurry (>) . ((^2) >< id)) p2
+                                     (cond ((== 0) . uncurry mod . swap) p1 (succ . p1)) (n,x)) 2 x
 
 g 1 = i1 ()
-g n = i2 (smallestPrimeFactor (2,n), div n (smallestPrimeFactor (2,n)))
+g n = i2 (smallestPrimeFactor n, div n (smallestPrimeFactor n))
 
 primes = anaList g
 \end{code}
@@ -610,13 +621,10 @@ recExpr = baseExpr id id
 \emph{Ana + cata + hylo}:
 \begin{code}
 
-cataExpr :: (Either b2 (Either b3 (Op, [b1])) -> b1) -> Expr b3 b2 -> b1
 cataExpr g = g . recExpr (cataExpr g) . outExpr
 
-anaExpr :: (a1 -> Either a2 (Either b (Op, [a1]))) -> a1 -> Expr b a2
 anaExpr g = inExpr . recExpr (anaExpr g) . g
                 
-hyloExpr :: (Either b2 (Either b3 (Op, [c])) -> c) -> (a -> Either b2 (Either b3 (Op, [a]))) -> a -> c
 hyloExpr h g = cataExpr h . anaExpr g
 
 \end{code}
@@ -655,11 +663,29 @@ let_exp f = cataExpr (either f (either N (uncurry T)))
 \end{code}
 Catamorfismo monádico:
 \begin{code}
-mcataExpr g = undefined
+mcataExpr g = g .! (dl' . recExpr (mcataExpr g) . outExpr)
+
+dl' :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
+dl' = either (return . i1) (either (return . i2 . i1) aux)
+    where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
 \end{code}
 Avaliação de expressões:
 \begin{code}
-evaluate = undefined
+evaluate = mcataExpr gene
+
+gene :: (Num a, Ord a) => Either b (Either a (Op, Maybe [a])) -> Maybe a
+gene = either (const Nothing) (either Just aux)
+    where aux (op, args) = do argsR <- args; result op argsR
+
+result :: (Num a, Ord a) => Op -> [a] -> Maybe a
+result Add [x, y] = Just (x + y)
+result Mul [x, y] = Just (x * y)
+result Suc [x] = Just (x + 1)
+result ITE [cond, t, f]
+  | cond > 0 = Just t
+  | otherwise = Just f
+result _ _ = Nothing
+
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%

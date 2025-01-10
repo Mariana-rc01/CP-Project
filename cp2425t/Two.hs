@@ -8,15 +8,25 @@ import Data.List
 import Cp
 import Exp
 import LTree
+import Nat (while, for)
+
 
 -- 2.1
 
-smallestPrimeFactor :: (Integer, Integer) -> Integer
-smallestPrimeFactor = cond (uncurry (>) . ((^2) >< id)) p2
-      (cond ((== 0) . uncurry mod . swap) p1 (smallestPrimeFactor . (succ >< id)))
+-- 1ª resolução
+smallestPrimeFactor' :: (Integer, Integer) -> Integer
+smallestPrimeFactor' = cond (uncurry (>) . ((^2) >< id)) p2 
+                      (cond ((== 0) . uncurry mod . swap) p1 (smallestPrimeFactor' . (succ >< id)))
+
+g' 1 = i1 ()
+g' n = i2 (smallestPrimeFactor' (2,n), div n (smallestPrimeFactor' (2,n)))
+
+-- 2ª resolução
+smallestPrimeFactor x = for (\n -> cond (uncurry (>) . ((^2) >< id)) p2
+                                     (cond ((== 0) . uncurry mod . swap) p1 (succ . p1)) (n,x)) 2 x
 
 g 1 = i1 ()
-g n = i2 (smallestPrimeFactor (2,n), div n (smallestPrimeFactor (2,n)))
+g n = i2 (smallestPrimeFactor n, div n (smallestPrimeFactor n))
 
 primes = anaList g
 
@@ -68,3 +78,4 @@ prime_tree' = hyloList geneCata geneAna
 -- 2ª resolução
 prime_tree :: [Integer] -> Exp Integer Integer
 prime_tree = Term 1 . untar . map (\n -> (primes n, n))
+
