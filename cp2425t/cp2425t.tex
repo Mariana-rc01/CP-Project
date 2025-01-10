@@ -939,7 +939,6 @@ Catamorfismo monádico:
 Avaliação de expressões:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{evaluate}\mathrel{=}\Varid{mcataExpr}\;\Varid{gene}{}\<[E]%
@@ -953,21 +952,15 @@ Avaliação de expressões:
 \\[\blanklineskip]%
 \>[B]{}\Varid{result}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Conid{Op}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Maybe}\;\Varid{a}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Add}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\Varid{y}){}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Add}\mathrel{=}\Conid{Just}\comp \Varid{sum}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Mul}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{*}\Varid{y}){}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Mul}\mathrel{=}\Conid{Just}\comp \Varid{product}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Suc}\;[\mskip1.5mu \Varid{x}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\mathrm{1}){}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Suc}\mathrel{=}\Conid{Just}\comp (\mathbin{+}\mathrm{1})\comp \Varid{head}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{ITE}\;[\mskip1.5mu \Varid{cond},\Varid{t},\Varid{f}\mskip1.5mu]{}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{ITE}\mathrel{=}\Conid{Just}\comp \Varid{cond}\;(\uncurry{(\mathbin{>})}\comp \conj{\Varid{head}}{\underline{\mathrm{0}}})\;(\uncurry{(\mathbin{!!})}\comp \conj{\Varid{id}}{\underline{\mathrm{1}}})\;(\uncurry{(\mathbin{!!})}\comp \conj{\Varid{id}}{\underline{\mathrm{2}}}){}\<[E]%
 \\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mid \Varid{cond}\mathbin{>}\mathrm{0}\mathrel{=}\Conid{Just}\;\Varid{t}{}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mid \Varid{otherwise}\mathrel{=}\Conid{Just}\;\Varid{f}{}\<[E]%
-\\
-\>[B]{}\Varid{result}\;\anonymous \;\anonymous \mathrel{=}\Conid{Nothing}{}\<[E]%
+\>[B]{}\Varid{result}\;\anonymous \mathrel{=}\underline{\Conid{Nothing}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

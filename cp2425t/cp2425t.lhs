@@ -678,13 +678,11 @@ gene = either (const Nothing) (either Just aux)
     where aux (op, args) = do argsR <- args; result op argsR
 
 result :: (Num a, Ord a) => Op -> [a] -> Maybe a
-result Add [x, y] = Just (x + y)
-result Mul [x, y] = Just (x * y)
-result Suc [x] = Just (x + 1)
-result ITE [cond, t, f]
-  | cond > 0 = Just t
-  | otherwise = Just f
-result _ _ = Nothing
+result Add = Just . sum
+result Mul = Just . product
+result Suc = Just . (+1) . head
+result ITE = Just . cond (uncurry (>) . split head (const 0)) (uncurry (!!) . split id (const 1)) (uncurry (!!) . split id (const 2))
+result _ = const Nothing
 
 \end{code}
 
