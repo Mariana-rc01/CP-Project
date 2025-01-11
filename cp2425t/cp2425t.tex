@@ -805,10 +805,10 @@ como um anamorfismo de listas (\ensuremath{\Conid{List}}). Assim, o diagrama que
            \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
 \\
      \ensuremath{\mathbb{Z}}^*
-            \ar@/_/[r]_-{\ensuremath{\Varid{outList}}} 
+            \ar[r]_-{\ensuremath{\Varid{outList}}} 
 &
      \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}^*
-           \ar@/_/[l]_-{\ensuremath{\Varid{inList}}}
+           \ar[l]_-{\ensuremath{\Varid{inList}}}
 }
 \end{eqnarray*}
 
@@ -964,19 +964,37 @@ Definição do tipo:
 \ColumnHook
 \end{hscode}\resethooks
 \emph{Monad}:
+
+Para declarar \ensuremath{\Conid{Expr}\;\Varid{b}} como instância da classe \ensuremath{\Conid{Monad}}, foram implementadas as intâncias de \ensuremath{\Conid{Functor}}, \ensuremath{\Conid{Applicative}} e \ensuremath{\Conid{Monad}} do tipo \ensuremath{\Conid{Expr}\;\Varid{b}}.
+A abordagem utilizada foi guiada pelo exercício 4 da ficha 12, adaptando ao contexto específico de \ensuremath{\Conid{Expr}\;\Varid{b}}.
+
+Começamos pelo \ensuremath{\Conid{Functor}}, onde a função \ensuremath{\mathsf{fmap}} aplica uma transformação às variáveis da expressão, mantendo as restantes estruturas (\ensuremath{\Conid{N}} e \ensuremath{\Conid{T}}) inalteradas.
+Esta operação é realizada de forma recursiva usando o catamorfismo - \ensuremath{\Varid{cataExpr}} -, que reconstrói a expressão após aplicar a \ensuremath{\Varid{f}} às variáveis.
+A composição com a função \ensuremath{\Varid{inExpr}} e a base do catamorfismo (\ensuremath{\Varid{baseExpr}}) assegura que a estrutura é processada corretamente.
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{6}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{9}{@{}>{\hspre}c<{\hspost}@{}}%
-\column{9E}{@{}l@{}}%
-\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\mathbf{instance}\;\Conid{Functor}\;(\Conid{Expr}\;\Varid{b}){}\<[E]%
 \\
 \>[B]{}\hsindent{6}{}\<[6]%
 \>[6]{}\mathbf{where}\;\mathsf{fmap}\;\Varid{f}\mathrel{=}\Varid{cataExpr}\;(\Varid{inExpr}\comp \Varid{baseExpr}\;\Varid{f}\;\Varid{id}\;\Varid{id}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+De seguida, definimos a instância \ensuremath{\Conid{Applicative}}, onde a função \ensuremath{\Varid{pure}} cria uma expressão com uma variável (\ensuremath{\Conid{V}}) com o valor fornecido,
+a função \ensuremath{\mathbin{<*>}} considera três casos:
+\begin{itemize}
+\item se a expressão é uma variável (\ensuremath{\Conid{V}\;\Varid{f}}), aplica \ensuremath{\mathsf{fmap}} para mapear função sobre a outra expressão;
+\item se a expressão é um número (\ensuremath{\Conid{N}\;\Varid{b}}), mantém o número inalterado;
+\item se a expressão é uma operação (\ensuremath{\Conid{T}\;\Varid{op}\;\Varid{fs}}), aplica a função a cada subexpressão da operação.
+\end{itemize}
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\mathbf{instance}\;\Conid{Applicative}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
@@ -993,7 +1011,19 @@ Definição do tipo:
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
 \>[5]{}(\Conid{T}\;\Varid{op}\;\Varid{fs})\mathbin{<*>}\Varid{x}\mathrel{=}\Conid{T}\;\Varid{op}\;(\map \;(\mathbin{<*>}\Varid{x})\;\Varid{fs}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Por fim, a instância \ensuremath{\Conid{Monad}} foi definida, a definição \ensuremath{\Varid{return}} é equivalente a \ensuremath{\Varid{pure}}, cria uma variável.
+A operação \ensuremath{\bind } aplica a função \ensuremath{\Varid{g}} a cada variável da expressão, usando a função auxiliar \ensuremath{\Varid{muExpr}} para processar a expressão resultante.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{9E}{@{}l@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\mathbf{instance}\;\Conid{Monad}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
@@ -1019,6 +1049,63 @@ Definição do tipo:
 \>[B]{}\Varid{u}\mathrel{=}\Conid{V}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+Provemos que \ensuremath{\Conid{Expr}\;\Varid{b}} é uma instância de \ensuremath{\Conid{Monad}}:
+\begin{itemize}
+\item \ensuremath{\Varid{u}\mathrel{=}\Conid{V}} e \ensuremath{\Conid{V}\mathrel{=}\Varid{inExpr}\comp i_1}, logo \ensuremath{\Varid{u}\mathrel{=}\Varid{inExpr}\comp i_1};
+\item \ensuremath{\Varid{muExpr}\mathrel{=}\Varid{cataExpr}\;\alt{\Varid{id}}{\Varid{inExpr}\comp i_2}}.
+\end{itemize}
+
+Provar a lei monádica Unidade (63):
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{mu}\comp \Varid{u}\mathrel{=}\Varid{mu}\comp \Conid{T}\;\Varid{u}}
+\just\equiv{ definição de mu; definição de u }
+\ensuremath{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \mathbf{in}\comp i_1\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \Conid{T}\;\Varid{u}}
+\just\equiv{ absorção-cata }
+\ensuremath{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \mathbf{in}\comp i_1\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp \Conid{B}\;(\Varid{u},\Varid{id})\,\rrparenthesis}
+\just\equiv{ B(f,g) = f + G g, absorção-+, natural-id, functor-id-F }
+\ensuremath{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \mathbf{in}\comp i_1\mathrel{=}\llparenthesis\, \alt{\Varid{u}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\equiv{ definição de u, cancelamento-cata }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp \Conid{F}\;\Varid{mu}\comp i_1\mathrel{=}\llparenthesis\, \alt{\;\mathbf{in}\comp i_1}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\equiv{ fusão-+, reflexão-+, reflexão-cata, base-cata, B(id, mu) = id + G mu }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp (\Varid{id}\mathbin{+}\Conid{G}\;\Varid{mu})\comp i_1\mathrel{=}\Varid{id}}
+\just\equiv{ natural-i1, natural-id }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp i_1\mathrel{=}\Varid{id}}
+\just\equiv{ cancelamento-+ }
+\ensuremath{\Varid{id}\mathrel{=}\Varid{id}}
+\just\equiv{ P.R.I. }
+\ensuremath{\Conid{True}}
+\qed
+\end{eqnarray*}
+
+Provar a lei monádica Multiplicação (62):
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\Varid{mu}\comp \Conid{T}\;\Varid{mu}}
+\just\equiv{ definição de mu }
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \Conid{T}\;\llparenthesis\, \cdot \,\rrparenthesis\;\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}}
+\just\equiv{ absorção-cata }
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp (\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\mathbin{+}\Conid{G}\;\Varid{id})\,\rrparenthesis}
+\just\equiv{ Functor-id-F, natural-id, absorção-+ }
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\llparenthesis\, \alt{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\equiv{ definição de mu }
+\ensuremath{\Varid{mu}\comp \llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\mathrel{=}\llparenthesis\, \alt{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\Leftarrow{ fusão-cata }
+\ensuremath{\Varid{mu}\comp \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\mathrel{=}\alt{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}{\;\mathbf{in}\comp i_2}\comp (\Varid{id}\mathbin{+}\Conid{G}\;\Varid{mu})}
+\just\equiv{ fusão-+, absorção-+, natural-id, eq-+ }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp i_1\mathrel{=}\Varid{id}}
+\just\equiv{ cancelamento-+ }
+\ensuremath{\begin{lcbr}\Varid{mu}\mathrel{=}\Varid{mu}\\\Varid{mu}\comp \mathbf{in}\comp i_2\mathrel{=}\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}\end{lcbr}}
+\just\equiv{ p \& True = True, definição de mu, cancelamento-cata, base-cata }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp (\Varid{id}\mathbin{+}\Conid{G}\;\Varid{mu})\comp i_2\mathrel{=}\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}}
+\just\equiv{ natural-i2, cancelamento-+ }
+\ensuremath{\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}\mathrel{=}\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}}
+\just\equiv{ P.R.I }
+\ensuremath{\Conid{True}}
+\qed
+\end{eqnarray*}
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
@@ -1028,6 +1115,7 @@ Definição do tipo:
 \>[B]{}\Varid{let\char95 exp}\;\Varid{f}\mathrel{=}\Varid{cataExpr}\;\alt{\Varid{f}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
 Catamorfismo monádico:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1043,6 +1131,8 @@ Catamorfismo monádico:
 \>[5]{}\mathbf{where}\;\Varid{aux}\;(\Varid{op},\Varid{ms})\mathrel{=}\mathbf{do}\;\Varid{m}\leftarrow \Varid{lamb}\;\Varid{ms};(\Varid{return}\comp i_2\comp i_2)\;(\Varid{op},\Varid{return}\;\Varid{m}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+
 Avaliação de expressões:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%

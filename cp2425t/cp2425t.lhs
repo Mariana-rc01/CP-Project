@@ -738,10 +738,30 @@ hyloExpr h g = cataExpr h . anaExpr g
 
 \end{code}
 \emph{Monad}:
+
+Para declarar |Expr b| como instância da classe |Monad|, foram implementadas as intâncias de |Functor|, |Applicative| e |Monad| do tipo |Expr b|.
+A abordagem utilizada foi guiada pelo exercício 4 da ficha 12, adaptando ao contexto específico de |Expr b|.
+
+Começamos pelo |Functor|, onde a função |fmap| aplica uma transformação às variáveis da expressão, mantendo as restantes estruturas (|N| e |T|) inalteradas.
+Esta operação é realizada de forma recursiva usando o catamorfismo - |cataExpr| -, que reconstrói a expressão após aplicar a |f| às variáveis.
+A composição com a função |inExpr| e a base do catamorfismo (|baseExpr|) assegura que a estrutura é processada corretamente.
+
 \begin{code}
 
 instance Functor (Expr b)
      where fmap f = cataExpr (inExpr . baseExpr f id id)
+
+\end{code}
+
+De seguida, definimos a instância |Applicative|, onde a função |pure| cria uma expressão com uma variável (|V|) com o valor fornecido,
+a função |<*>| considera três casos:
+\begin{itemize}
+\item se a expressão é uma variável (|V f|), aplica |fmap| para mapear função sobre a outra expressão;
+\item se a expressão é um número (|N b|), mantém o número inalterado;
+\item se a expressão é uma operação (|T op fs|), aplica a função a cada subexpressão da operação.
+\end{itemize}
+
+\begin{code}
 
 instance Applicative (Expr b) where
     pure :: a -> Expr b a
@@ -749,6 +769,13 @@ instance Applicative (Expr b) where
     (V f) <*> x = fmap f x
     (N b) <*> _ = N b
     (T op fs) <*> x = T op (map (<*> x) fs)
+
+\end{code}
+
+Por fim, a instância |Monad| foi definida, a definição |return| é equivalente a |pure|, cria uma variável.
+A operação |>>=| aplica a função |g| a cada variável da expressão, usando a função auxiliar |muExpr| para processar a expressão resultante.
+
+\begin{code}
 
 instance Monad (Expr b) where
     return :: a -> Expr b a
@@ -764,12 +791,114 @@ u :: a -> Expr b a
 u = V
 
 \end{code}
+
+Provemos que |Expr b| é uma instância de |Monad|:
+\begin{itemize}
+\item |u = V| e |V = inExpr . i1|, logo |u = inExpr . i1|;
+\item |muExpr = cataExpr (either id (inExpr . i2))|.
+\end{itemize}
+
+Provar a lei monádica Unidade (63):
+\begin{eqnarray*}
+\start
+|
+	mu . u = mu . T u
+|
+\just\equiv{ definição de mu; definição de u }
+|
+    cata (either id (in . i2)) . in . i1 = cata (either id (in . i2)) . T u
+|
+\just\equiv{ absorção-cata }
+|
+    cata (either id (in . i2)) . in . i1 = cata (either id (in . i2) . B(u,id))
+|
+\just\equiv{ B(f,g) = f + G g, absorção-+, natural-id, functor-id-F }
+|
+    cata (either id (in . i2)) . in . i1 = cata (either u (in.i2))
+|
+\just\equiv{ definição de u, cancelamento-cata }
+|
+    either id (in . i2) . F mu . i1 = cata (either (in.i1) (in.i2))
+|
+\just\equiv{ fusão-+, reflexão-+, reflexão-cata, base-cata, B(id, mu) = id + G mu }
+|
+    either id (in . i2) . (id + G mu) . i1 = id
+|
+\just\equiv{ natural-i1, natural-id }
+|
+    either id (in . i2) . i1 = id
+|
+\just\equiv{ cancelamento-+ }
+|
+    id = id
+|
+\just\equiv{ P.R.I. }
+|
+    True
+|
+\qed
+\end{eqnarray*}
+
+Provar a lei monádica Multiplicação (62):
+\begin{eqnarray*}
+\start
+|
+	mu . mu = mu . T mu
+|
+\just\equiv{ definição de mu }
+|
+    mu.mu = cata (either id (in . i2)) . T cata (either id (in . i2))
+|
+\just\equiv{ absorção-cata }
+|
+    mu.mu = cata (either id (in . i2) . (cata (either id (in.i2)) + G id))
+|
+\just\equiv{ Functor-id-F, natural-id, absorção-+ }
+|
+    mu.mu = cata (either (cata (either id (in.i2))) (in.i2))
+|
+\just\equiv{ definição de mu }
+|
+    mu.cata (either id (in.i2)) = cata (either (cata (either id (in.i2))) (in.i2))
+|
+\just\Leftarrow{ fusão-cata }
+|
+    mu. either id (in.i2) = either (cata (either id (in.i2))) (in.i2) . (id + G mu)
+|
+\just\equiv{ fusão-+, absorção-+, natural-id, eq-+ }
+|
+    either id (in . i2) . i1 = id
+|
+\just\equiv{ cancelamento-+ }
+|
+    lcbr(
+          mu = mu
+     )(
+          mu . in . i2 = in . i2 . G mu
+     )
+|
+\just\equiv{ p \& True = True, definição de mu, cancelamento-cata, base-cata }
+|
+    either id (in . i2) . (id + G mu) . i2 = in . i2 . G mu
+|
+\just\equiv{ natural-i2, cancelamento-+ }
+|
+    in . i2 . G mu = in . i2 . G mu
+|
+\just\equiv{ P.R.I }
+|
+    True
+|
+\qed
+\end{eqnarray*}
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
 \begin{code}
 let_exp f = cataExpr (either f (either N (uncurry T)))
 \end{code}
+
 Catamorfismo monádico:
 \begin{code}
 mcataExpr g = g .! (dl' . recExpr (mcataExpr g) . outExpr)
@@ -778,6 +907,8 @@ dl' :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, 
 dl' = either (return . i1) (either (return . i2 . i1) aux)
     where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
 \end{code}
+
+
 Avaliação de expressões:
 \begin{code}
 evaluate = mcataExpr gene
