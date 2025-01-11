@@ -797,18 +797,18 @@ como um anamorfismo de listas (\ensuremath{\Conid{List}}). Assim, o diagrama que
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
-    \ensuremath{\mathbb{Z}}^*
+    \ensuremath{\mathbb{Z}}
            \ar[d]_-{\ensuremath{\anaList{\Varid{g}}}}
+            \ar[r]_-{\ensuremath{\Varid{g}}} 
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
+\\
+     \ensuremath{\mathbb{Z}}^*
             \ar@/_/[r]_-{\ensuremath{\Varid{outList}}} 
 &
-    \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}^*
-           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
+     \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}^*
            \ar@/_/[l]_-{\ensuremath{\Varid{inList}}}
-\\
-     \ensuremath{\mathbb{Z}}
-&
-     \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}
-           \ar[l]^-{\ensuremath{\Varid{g}}}
 }
 \end{eqnarray*}
 
@@ -874,6 +874,10 @@ Primeira parte:
 \>[B]{}\Varid{primes}\mathrel{=}\anaList{\Varid{g}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+A função \ensuremath{\Varid{prime\char95 tree}} é responsável por criar a árvore dos primos de uma lista de inteiros, como se encontra ilustrado no enunciado.
+De modo que, esta função pode ser definida da seguinte forma:
+
 Segunda parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -881,6 +885,43 @@ Segunda parte:
 \>[B]{}\Varid{prime\char95 tree}\mathrel{=}\Conid{Term}\;\mathrm{1}\comp \Varid{untar}\comp \map \;(\lambda \Varid{n}\to (\Varid{primes}\;\Varid{n},\Varid{n})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+Inicialmente, adotámos uma abordagem extensiva para resolver o problema, com a definição de um hilomorfismo e todas as operações necessárias para construir a árvore.
+No entanto, durante este processo, reparámos na função \ensuremath{\Varid{untar}} da biblioteca \ensuremath{\Varid{\Conid{Exp}.hs}}, que efetua a operação necessária para transformar uma lista de pares numa estrutura do tipo \ensuremath{[\mskip1.5mu \Conid{Exp}\;\Varid{v}\;\Varid{o}\mskip1.5mu]}.
+Após compreendermos o comportamento e a definição da função \ensuremath{\Varid{untar}}, percebemos que era possível utilizá-la na construção da função \ensuremath{\Varid{prime\char95 tree}}, o que simplificou a implementação.
+
+Explicação da função \ensuremath{\Varid{prime\char95 tree}}:
+
+1. A função \ensuremath{\Varid{primes}} é aplicada a cada elemento da lista de inteiros e com o uso da expressão \ensuremath{\map \;(\lambda \Varid{n}\to (\Varid{primes}\;\Varid{n},\Varid{n}))}, obtemos uma lista de pares, onde o primeiro elemento é a lista de fatores primos de um número e o segundo elemento é o próprio número.
+Assim, no final da execução desta expressão, obtemos uma lista de pares do tipo \ensuremath{[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu]}.
+
+2. Neste contexto, a função \ensuremath{\Varid{untar}} converte os fatores primos de um número e o próprio número numa representação de árvore onde os nós intermediários são os fatores e as folhas são os números originais, \ensuremath{[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]}.
+Esta conversão é realizada em três partes principais: a coalgebra, a base e a álgebra.
+
+2.1. A coalgebra, representada pela função \ensuremath{\Varid{c}}, é responsável por decompor os dados, ou seja, separa os pares da lista inicial - \ensuremath{[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu]} - e transforma cada elemento para o formato \ensuremath{\mathbb{Z}+(\mathbb{Z},[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu])}.
+
+2.1.1. O \ensuremath{\map \;((\p2\mathbin{-!-}\Varid{assocr})\comp \Varid{distl}\comp (\Varid{outList}\times\Varid{id}))} é aplicado a cada par da lista, onde:
+    \begin{itemize}
+        \item \ensuremath{\Varid{outList}\times\Varid{id}} transforma a lista de fatores primos num tipo \ensuremath{\cdot +\cdot } e retorna o número original. Permitindo tratar em separado os fatores primos e os números. 
+        \item \ensuremath{\Varid{distl}} distribui os elementos \ensuremath{(\Varid{a},\Varid{b})+\cdot } para o tipo \ensuremath{(\Varid{a}+\Varid{b},\Varid{b})}, separa os dados para facilitar o processamento posterior.
+        \item \ensuremath{\p2\mathbin{-!-}\Varid{assocr}} reorganiza os pares para agrupar corretamente os fatores primos associados a um número.
+    \end{itemize}
+
+2.1.2. \ensuremath{\Varid{sep}} percorre a lista de elementos \ensuremath{\cdot +\cdot }, e separa os elementos \ensuremath{i_1} para o primeiro grupo e os \ensuremath{i_2} para o segundo grupo.
+
+2.1.3. \ensuremath{\Varid{id}\times\Varid{collect}} aplica a função \ensuremath{\Varid{id}} ao primeiro valor do tuplo e \ensuremath{\Varid{collect}} ao segundo, de modo que a função \ensuremath{\Varid{collect}} é responsável por agrupar os fatores primos em listas separadas para cada número.
+Então, os números que partilham o mesmo fator primo são agrupados juntos.
+
+2.1.4. \ensuremath{\Varid{join}} junta os valores numa lista única, recriando a estrutura necessária para representare os dados.
+
+2.2. Após a coalgebra, avançamos para a base, esta aplica recursivamente a função \ensuremath{\Varid{untar}} a cada sublista e cria subárvores para cada conjunto de fatores. O tipo da função \ensuremath{\Varid{base}} é definido como:
+
+\ensuremath{\Varid{base}\mathbin{::}(\mathbb{Z}\to \mathbb{Z})\to (\mathbb{Z}\to \mathbb{Z})\to ([\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu]\to [\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu])\to [\mskip1.5mu \mathbb{Z}+(\mathbb{Z},[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu])\mskip1.5mu]\to [\mskip1.5mu \mathbb{Z}+(\mathbb{Z},[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu])\mskip1.5mu]}.
+
+2.3. Para finalizar, a álgebra \ensuremath{\Varid{a}} organiza os dados processados na estrutura final, a operação \ensuremath{\Varid{sort}} organiza os nós, enquanto que o \ensuremath{\map \;\Varid{inExp}} converte os elementos numa estrutura do tipo \ensuremath{\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}}.
+O seu tipo, neste contexto, é definido como: \ensuremath{\Varid{a}\mathbin{::}[\mskip1.5mu \mathbb{Z}+(\mathbb{Z},[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu])\mskip1.5mu]\to [\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]}.
+
+3. Por fim, a função \ensuremath{\Conid{Term}\;\mathrm{1}} é aplicada para adicionar a raíz da árvore com o valor 1, isto conecta todas as subárvores criadas pela função \ensuremath{\Varid{untar}}, construindo uma única árvore que representa a decomposição de todos os números da lista.
 
 \subsection*{Problema 3}
 

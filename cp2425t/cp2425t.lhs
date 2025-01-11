@@ -181,6 +181,7 @@ import Data.Ratio
 import Control.Concurrent
 import Data.List (find)
 import BTree (hyloBTree, qsep)
+import Text.XHtml (paragraph)
 
 main = undefined
 \end{code}
@@ -588,18 +589,18 @@ como um anamorfismo de listas (|List|). Assim, o diagrama que representa a opera
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
-    |Integer|^*
+    |Integer|
            \ar[d]_-{|anaList g|}
+            \ar[r]_-{|g|} 
+&
+    |1 + Integer| \times |Integer|
+           \ar[d]^{|id + (id| \times |anaList g|)}
+\\
+     |Integer|^*
             \ar[r]_-{|outList|} 
 &
-    |1 + Integer| \times |Integer|^*
-           \ar[d]^{|id + (id| \times |anaList g|)}
+     |1 + Integer| \times |Integer|^*
            \ar[l]_-{|inList|}
-\\
-     |Integer|
-&
-     |1 + Integer| \times |Integer|
-           \ar[l]^-{|g|}
 }
 \end{eqnarray*}
 
@@ -660,11 +661,51 @@ g n = i2 (smallestPrimeFactor n, div n (smallestPrimeFactor n))
 primes = anaList g
 \end{code}
 
+A função |prime_tree| é responsável por criar a árvore dos primos de uma lista de inteiros, como se encontra ilustrado no enunciado.
+De modo que, esta função pode ser definida da seguinte forma:
 
 Segunda parte:
 \begin{code}
 prime_tree = Term 1 . untar . map (\n -> (primes n, n))
 \end{code}
+
+Inicialmente, adotámos uma abordagem extensiva para resolver o problema, com a definição de um hilomorfismo e todas as operações necessárias para construir a árvore.
+No entanto, durante este processo, reparámos na função |untar| da biblioteca |Exp.hs|, que efetua a operação necessária para transformar uma lista de pares numa estrutura do tipo |[Exp v o]|.
+Após compreendermos o comportamento e a definição da função |untar|, percebemos que era possível utilizá-la na construção da função |prime_tree|, o que simplificou a implementação.
+
+Explicação da função |prime_tree|:
+
+1. A função |primes| é aplicada a cada elemento da lista de inteiros e com o uso da expressão |map (\n -> (primes n, n))|, obtemos uma lista de pares, onde o primeiro elemento é a lista de fatores primos de um número e o segundo elemento é o próprio número.
+Assim, no final da execução desta expressão, obtemos uma lista de pares do tipo |[([Integer], Integer)]|.
+
+2. Neste contexto, a função |untar| converte os fatores primos de um número e o próprio número numa representação de árvore onde os nós intermediários são os fatores e as folhas são os números originais, |[Exp Integer Integer]|.
+Esta conversão é realizada em três partes principais: a coalgebra, a base e a álgebra.
+
+2.1. A coalgebra, representada pela função |c|, é responsável por decompor os dados, ou seja, separa os pares da lista inicial - |[([Integer], Integer)]| - e transforma cada elemento para o formato |Either Integer (Integer, [([Integer], Integer)])|.
+
+2.1.1. O |map((p2-!-assocr).distl.(outList >< id))| é aplicado a cada par da lista, onde:
+    \begin{itemize}
+        \item |outList >< id| transforma a lista de fatores primos num tipo |Either| e retorna o número original. Permitindo tratar em separado os fatores primos e os números. 
+        \item |distl| distribui os elementos |Either (a, b)| para o tipo |(Either a b, b)|, separa os dados para facilitar o processamento posterior.
+        \item |p2-!-assocr| reorganiza os pares para agrupar corretamente os fatores primos associados a um número.
+    \end{itemize}
+
+2.1.2. |sep| percorre a lista de elementos |Either|, e separa os elementos |Left| para o primeiro grupo e os |Right| para o segundo grupo.
+
+2.1.3. |id >< collect| aplica a função |id| ao primeiro valor do tuplo e |collect| ao segundo, de modo que a função |collect| é responsável por agrupar os fatores primos em listas separadas para cada número.
+Então, os números que partilham o mesmo fator primo são agrupados juntos.
+
+2.1.4. |join| junta os valores numa lista única, recriando a estrutura necessária para representare os dados.
+
+2.2. Após a coalgebra, avançamos para a base, esta aplica recursivamente a função |untar| a cada sublista e cria subárvores para cada conjunto de fatores. O tipo da função |base| é definido como:
+
+|base :: (Integer -> Integer) -> (Integer -> Integer) -> ([([Integer], Integer)] -> [Exp Integer Integer]) 
+ -> [Either Integer (Integer, [([Integer], Integer)])] -> [Either Integer (Integer, [Exp Integer Integer])]|.
+
+2.3. Para finalizar, a álgebra |a| organiza os dados processados na estrutura final, a operação |sort| organiza os nós, enquanto que o |map inExp| converte os elementos numa estrutura do tipo |Exp Integer Integer|.
+O seu tipo, neste contexto, é definido como: | a :: [Either Integer (Integer, [Exp Integer Integer])] -> [Exp Integer Integer]|.
+
+3. Por fim, a função |Term 1| é aplicada para adicionar a raíz da árvore com o valor 1, isto conecta todas as subárvores criadas pela função |untar|, construindo uma única árvore que representa a decomposição de todos os números da lista.
 
 \subsection*{Problema 3}
 
