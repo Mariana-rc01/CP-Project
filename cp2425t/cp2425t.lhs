@@ -863,14 +863,14 @@ Representado pelo seguinte diagrama:
            \ar@@/^-1pc/[r]_-{| out |}
 &
     |A + (C + (Op >< (Expr C A)|^*))
-           \ar[d]^{|id + (id + (id >< map (cataNat g)))|}
            \ar@@/^-1pc/[l]_-{|inNat |}
 \\
     |Expr C B|
-            \ar[u]_-{|ana g|}
+            \ar[u]^-{|ana g|}
+            \ar[r]_-{|g|}
 &
     |A + (C + (Op >< (Expr C B)|^*))
-           \ar[l]^-{|g|}
+            \ar[u]_-{|id + (id + (id >< map (ana g)))|}
 }
 \end{eqnarray*}
 

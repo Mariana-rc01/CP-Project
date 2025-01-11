@@ -1050,14 +1050,14 @@ Representado pelo seguinte diagrama:
            \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
 &
     \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
-           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{g}}))}}
            \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
 \\
     \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
-            \ar[u]_-{\ensuremath{\ana{\Varid{g}}}}
+            \ar[u]^-{\ensuremath{\ana{\Varid{g}}}}
+            \ar[r]_-{\ensuremath{\Varid{g}}}
 &
     \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
-           \ar[l]^-{\ensuremath{\Varid{g}}}
+            \ar[u]_-{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\ana{\Varid{g}}))}}
 }
 \end{eqnarray*}
 
