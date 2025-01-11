@@ -945,13 +945,13 @@ Cálculo de outExpr:
 \ensuremath{\Varid{outExpr}\comp \Varid{inExpr}\mathrel{=}\Varid{id}}
 \just\equiv{def inExpr}
 \ensuremath{\Varid{outExpr}\comp \alt{\Conid{V}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}\mathrel{=}\Varid{id}}
-\just\equiv{ Fusão + x }
+\just\equiv{ fusão + }
 \ensuremath{\alt{\Varid{outExpr}\comp \Conid{V}}{\alt{\Varid{outExpr}\comp \Conid{N}}{\Varid{outExpr}\comp \uncurry{\Conid{T}}}}\mathrel{=}\Varid{id}}
-\just\equiv{ Universal +, Natural id }
+\just\equiv{ universal +, natural id }
 \ensuremath{\begin{lcbr}\Varid{outExpr}\comp \Conid{V}\mathrel{=}i_1\\\alt{\Varid{outExpr}\comp \Conid{N}}{\Varid{outExpr}\comp \uncurry{\Conid{T}}}\mathrel{=}i_2\end{lcbr}}
-\just\equiv{ Universal + }
+\just\equiv{ universal + }
 \ensuremath{\begin{lcbr}\Varid{outExpr}\comp \Conid{V}\mathrel{=}i_1\\\Varid{outExpr}\comp \Conid{N}\mathrel{=}i_2\comp i_1\\\Varid{outExpr}\comp \uncurry{\Conid{T}}\mathrel{=}i_2\comp i_2\end{lcbr}}
-\just\equiv{ Igualdade extensional, Def-comp, Uncurry }
+\just\equiv{ igualdade extensional, def-comp, uncurry }
 \ensuremath{\begin{lcbr}\Varid{outExpr}\;(\Conid{V}\;\Varid{n})\mathrel{=}i_1\;\Varid{n}\\\Varid{outExpr}\;(\Conid{N}\;\Varid{n})\mathrel{=}(i_2\comp i_1)\;\Varid{n}\\\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{exprs})\end{lcbr}}
 \end{eqnarray*}
 
@@ -977,7 +977,7 @@ Sabendo que \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\V
 \begin{eqnarray*}
 \start
 \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\Varid{id},\Varid{f})}
-\just\equiv{ Def B }
+\just\equiv{ def B }
 \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}\Varid{id}\times\map \;\Varid{f})}
 \end{eqnarray*}
 
@@ -998,9 +998,9 @@ Começando pelo catamorfismo de \ensuremath{\Conid{Expr}}, temos:
 
 \begin{eqnarray*}
 \start
-\just\equiv{ Cancelamento-cata }
+\just\equiv{ cancelamento-cata }
 \ensuremath{\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \mathsf{in}\mathrel{=}\Varid{g}\comp \fun F \;\llparenthesis\, \Varid{g}\,\rrparenthesis}
-\just\equiv{ Shunt-left }
+\just\equiv{ shunt-left }
 \ensuremath{\llparenthesis\, \Varid{g}\,\rrparenthesis\mathrel{=}\Varid{g}\comp \fun F \;\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \mathsf{out}}
 \end{eqnarray*}
 
@@ -1036,9 +1036,9 @@ Para o anamorfismo de \ensuremath{\Conid{Expr}}, temos:
 
 \begin{eqnarray*}
 \start
-\just\equiv{ Cancelamento-ana }
+\just\equiv{ cancelamento-ana }
 \ensuremath{\mathsf{out}\comp \ana{\Varid{g}}\mathrel{=}\fun F \;\ana{\Varid{g}}\comp \Varid{g}}
-\just\equiv{ Shunt-right }
+\just\equiv{ shunt-right }
 \ensuremath{\ana{\Varid{g}}\mathrel{=}\mathsf{in}\comp \fun F \;\ana{\Varid{g}}\comp \Varid{g}}
 \end{eqnarray*}
 

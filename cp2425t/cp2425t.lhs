@@ -729,11 +729,11 @@ Cálculo de outExpr:
 |
      outExpr . either V (either N (uncurry T)) = id
 |
-\just\equiv{ Fusão + x }
+\just\equiv{ fusão + }
 |
      either (outExpr . V) (either (outExpr . N) (outExpr . uncurry T)) = id
 |
-\just\equiv{ Universal +, Natural id }
+\just\equiv{ universal +, natural id }
 |
     lcbr(
           outExpr . V = i1
@@ -741,7 +741,7 @@ Cálculo de outExpr:
           either (outExpr . N) (outExpr . uncurry T) = i2
      )
 |
-\just\equiv{ Universal + }
+\just\equiv{ universal + }
 |
     lcbr3(
           outExpr . V = i1
@@ -751,7 +751,7 @@ Cálculo de outExpr:
           outExpr . uncurry T = i2 . i2
      )
 |
-\just\equiv{ Igualdade extensional, Def-comp, Uncurry }
+\just\equiv{ igualdade extensional, def-comp, uncurry }
 |
     lcbr3(
           outExpr (V n) = i1 n
@@ -783,7 +783,7 @@ Sabendo que |F f = B(id, f)|, temos que:
 |
     F f = B(id, id, f)
 |
-\just\equiv{ Def B }
+\just\equiv{ def B }
 |
     F f = id + (id + id >< map f)
 |
@@ -804,11 +804,11 @@ Começando pelo catamorfismo de |Expr|, temos:
 
 \begin{eqnarray*}
 \start
-\just\equiv{ Cancelamento-cata }
+\just\equiv{ cancelamento-cata }
 |
     cata g . inT = g . fF (cata g)
 |
-\just\equiv{ Shunt-left }
+\just\equiv{ shunt-left }
 |
     cata g = g . fF (cata g) . outT
 |
@@ -845,11 +845,11 @@ Para o anamorfismo de |Expr|, temos:
 
 \begin{eqnarray*}
 \start
-\just\equiv{ Cancelamento-ana }
+\just\equiv{ cancelamento-ana }
 |
     outT . ana g = fF (ana g) . g
 |
-\just\equiv{ Shunt-right }
+\just\equiv{ shunt-right }
 |
     ana g = inT . fF (ana g) . g
 |
