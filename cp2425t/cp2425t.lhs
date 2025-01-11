@@ -606,6 +606,67 @@ convolve = undefined
 \end{code}
 
 \subsection*{Problema 4}
+
+Cálculo de outExpr:
+
+\begin{eqnarray*}
+\start
+|
+     outExpr . inExpr = id
+|
+\just\equiv{def inExpr}
+|
+     outExpr . either V (either N (uncurry T)) = id
+|
+\just\equiv{ Fusão + x }
+|
+     either (outExpr . V) (either (outExpr . N) (outExpr . uncurry T)) = id
+|
+\just\equiv{ Universal +, Natural id }
+|
+    lcbr(
+          outExpr . V = i1
+     )(
+          either (outExpr . N) (outExpr . uncurry T) = i2
+     )
+|
+\just\equiv{ Universal + }
+|
+    lcbr3(
+          outExpr . V = i1
+     )(
+          outExpr . N = i2 . i1
+     )(
+          outExpr . uncurry T = i2 . i2
+     )
+|
+\just\equiv{ Igualdade extensional, Def-comp, Uncurry }
+|
+    lcbr3(
+          outExpr (V n) = i1 n
+     )(
+          outExpr (N n) = (i2 . i1) n
+     )(
+          outExpr (T op exprs) = (i2 . i2) (op, exprs)
+     )
+|
+\end{eqnarray*}
+
+Ficando assim, em Haskell, com:
+
+\begin{code}
+
+outExpr :: Expr b a -> Either a (Either b (Op, [Expr b a]))
+outExpr (V n) = i1 n
+outExpr (N n) = (i2.i1) n
+outExpr (T op exprs) = (i2.i2) (op,exprs)
+
+\end{code}
+
+Cálculo de recExpr:
+
+
+
 Definição do tipo:
 \begin{code}
 

@@ -828,6 +828,43 @@ Segunda parte:
 \end{hscode}\resethooks
 
 \subsection*{Problema 4}
+
+Cálculo de outExpr:
+
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{outExpr}\comp \Varid{inExpr}\mathrel{=}\Varid{id}}
+\just\equiv{def inExpr}
+\ensuremath{\Varid{outExpr}\comp \alt{\Conid{V}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}\mathrel{=}\Varid{id}}
+\just\equiv{ Fusão + x }
+\ensuremath{\alt{\Varid{outExpr}\comp \Conid{V}}{\alt{\Varid{outExpr}\comp \Conid{N}}{\Varid{outExpr}\comp \uncurry{\Conid{T}}}}\mathrel{=}\Varid{id}}
+\just\equiv{ Universal +, Natural id }
+\ensuremath{\begin{lcbr}\Varid{outExpr}\comp \Conid{V}\mathrel{=}i_1\\\alt{\Varid{outExpr}\comp \Conid{N}}{\Varid{outExpr}\comp \uncurry{\Conid{T}}}\mathrel{=}i_2\end{lcbr}}
+\just\equiv{ Universal + }
+\ensuremath{\begin{lcbr}\Varid{outExpr}\comp \Conid{V}\mathrel{=}i_1\\\Varid{outExpr}\comp \Conid{N}\mathrel{=}i_2\comp i_1\\\Varid{outExpr}\comp \uncurry{\Conid{T}}\mathrel{=}i_2\comp i_2\end{lcbr}}
+\just\equiv{ Igualdade extensional, Def-comp, Uncurry }
+\ensuremath{\begin{lcbr}\Varid{outExpr}\;(\Conid{V}\;\Varid{n})\mathrel{=}i_1\;\Varid{n}\\\Varid{outExpr}\;(\Conid{N}\;\Varid{n})\mathrel{=}(i_2\comp i_1)\;\Varid{n}\\\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{exprs})\end{lcbr}}
+\end{eqnarray*}
+
+Ficando assim, em Haskell, com:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{outExpr}\mathbin{::}\Conid{Expr}\;\Varid{b}\;\Varid{a}\to \Varid{a}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Conid{Expr}\;\Varid{b}\;\Varid{a}\mskip1.5mu])){}\<[E]%
+\\
+\>[B]{}\Varid{outExpr}\;(\Conid{V}\;\Varid{n})\mathrel{=}i_1\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{outExpr}\;(\Conid{N}\;\Varid{n})\mathrel{=}(i_2\comp i_1)\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{exprs}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Cálculo de recExpr:
+
+
+
 Definição do tipo:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
