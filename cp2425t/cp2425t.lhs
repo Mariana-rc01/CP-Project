@@ -820,11 +820,11 @@ Representado pelo seguinte diagrama:
 \xymatrix@@C=2cm{
     |Expr C A|
            \ar[d]_-{|cataNat g|}
-           \ar[r]_-{|outNat|}
+           \ar@@/^-1pc/[r]_-{| out |}
 &
     |A + (C + (Op >< (Expr C A)|^*))
            \ar[d]^{|id + (id + (id >< map (cataNat g)))|}
-           \ar[l]_-{|inNat|}
+           \ar@@/^-1pc/[l]_-{|inNat |}
 \\
     |Expr C B|
 &
@@ -841,9 +841,48 @@ cataExpr g = g . recExpr (cataExpr g) . outExpr
 
 \end{code}
 
+Para o anamorfismo de |Expr|, temos:
+
+\begin{eqnarray*}
+\start
+\just\equiv{ Cancelamento-ana }
+|
+    outT . ana g = fF (ana g) . g
+|
+\just\equiv{ Shunt-right }
+|
+    ana g = inT . fF (ana g) . g
+|
+\end{eqnarray*}
+
+Representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (cataNat g)))|}
+           \ar@@/^-1pc/[l]_-{|inNat |}
+\\
+    |Expr C B|
+            \ar[u]_-{|ana g|}
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|g|}
+}
+\end{eqnarray*}
+
+Utilizando as funções previamente definidas, temos então:
+
 \begin{code}
 
 anaExpr g = inExpr . recExpr (anaExpr g) . g
+
+\end{code}
+
+\begin{code}
                 
 hyloExpr h g = cataExpr h . anaExpr g
 

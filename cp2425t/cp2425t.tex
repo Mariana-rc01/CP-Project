@@ -1010,11 +1010,11 @@ Representado pelo seguinte diagrama:
 \xymatrix@C=2cm{
     \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
            \ar[d]_-{\ensuremath{\cataNat{\Varid{g}}}}
-           \ar[r]_-{\ensuremath{\Varid{outNat}}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
 &
     \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
            \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{g}}))}}
-           \ar[l]_-{\ensuremath{\mathsf{in}}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
 \\
     \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
 &
@@ -1032,11 +1032,47 @@ Utilizando as funções previamente definidas, temos então:
 \ColumnHook
 \end{hscode}\resethooks
 
+Para o anamorfismo de \ensuremath{\Conid{Expr}}, temos:
+
+\begin{eqnarray*}
+\start
+\just\equiv{ Cancelamento-ana }
+\ensuremath{\mathsf{out}\comp \ana{\Varid{g}}\mathrel{=}\fun F \;\ana{\Varid{g}}\comp \Varid{g}}
+\just\equiv{ Shunt-right }
+\ensuremath{\ana{\Varid{g}}\mathrel{=}\mathsf{in}\comp \fun F \;\ana{\Varid{g}}\comp \Varid{g}}
+\end{eqnarray*}
+
+Representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{g}}))}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+            \ar[u]_-{\ensuremath{\ana{\Varid{g}}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+           \ar[l]^-{\ensuremath{\Varid{g}}}
+}
+\end{eqnarray*}
+
+Utilizando as funções previamente definidas, temos então:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{anaExpr}\;\Varid{g}\mathrel{=}\Varid{inExpr}\comp \Varid{recExpr}\;(\Varid{anaExpr}\;\Varid{g})\comp \Varid{g}{}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{hyloExpr}\;\Varid{h}\;\Varid{g}\mathrel{=}\Varid{cataExpr}\;\Varid{h}\comp \Varid{anaExpr}\;\Varid{g}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
