@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.10)  10 JAN 2025 23:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.10)  11 JAN 2025 16:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1429,27 +1429,18 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 [7]
 \openout7 = `cp2425t.ptb'.
 
-\openout7 = `cp2425t.ptb'.
-
+ <xymatrix 2x2
 LaTeX Font Info:    Trying to load font information for T1+lmr on input line 81
-0.
+2.
  (/usr/share/texmf/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-\openout7 = `cp2425t.ptb'.
-
-\openout7 = `cp2425t.ptb'.
-
-
+) 235> <xymatrix 1x5
+158>
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
 [8{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}]
-\openout7 = `cp2425t.ptb'.
-
-\openout7 = `cp2425t.ptb'.
-
 \openout7 = `cp2425t.ptb'.
 
 \openout7 = `cp2425t.ptb'.
@@ -1460,6 +1451,33 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  []
 
 [9]
+LaTeX Font Info:    Trying to load font information for TS1+PTSerif-TLF on inpu
+t line 905.
+ (/usr/share/texlive/texmf-dist/tex/latex/paratype/TS1PTSerif-TLF.fd
+File: TS1PTSerif-TLF.fd 2014/02/02 Font definitions for TS1/PTSerif-TLF.
+)
+\openout7 = `cp2425t.ptb'.
+
+
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
+
+[10{/usr/share/texlive/texmf-dist/fonts/enc/dvips/paratype/ptserif_ts1.enc}]
+\openout7 = `cp2425t.ptb'.
+
+\openout7 = `cp2425t.ptb'.
+
+\openout7 = `cp2425t.ptb'.
+
+
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
+
+[11]
+\openout7 = `cp2425t.ptb'.
+
 \openout7 = `cp2425t.ptb'.
 
 \openout7 = `cp2425t.ptb'.
@@ -1471,7 +1489,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[10] [11
+[12] [13
 
 
 ]) (./cp2425t.bbl
@@ -1484,7 +1502,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[12
+[14
 
 ] (./cp2425t.aux)
  ***********
@@ -1502,13 +1520,13 @@ Package rerunfilecheck Info: File `cp2425t.out' has not changed.
 (rerunfilecheck)             Checksum: 77E1DCEE2046690F1FC223B6C42FC6FD;1148.
  ) 
 Here is how much of TeX's memory you used:
- 47759 strings out of 476106
- 1045499 string characters out of 5793933
- 1947975 words of memory out of 5000000
- 69061 multiletter control sequences out of 15000+600000
- 791287 words of font info for 147 fonts, out of 8000000 for 9000
+ 47811 strings out of 476106
+ 1046591 string characters out of 5793933
+ 1946975 words of memory out of 5000000
+ 69105 multiletter control sequences out of 15000+600000
+ 791924 words of font info for 149 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 99i,19n,101p,3281b,664s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,19n,101p,3281b,686s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/paratype/ptserif/PTF55F.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/paratype/ptserif/PTF56F.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/paratype/ptserif/PTF75F.pfb></usr/share/texlive/te
@@ -1522,15 +1540,16 @@ b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
 /share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/t
 exlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/share/texmf/fonts/ty
-pe1/public/lm/lmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
-nts/symbols/msam10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/stmaryr
-d/stmary9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/xypic/xyatip10.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/xypic/xybtip10.pfb>
-Output written on cp2425t.pdf (13 pages, 714466 bytes).
+pe1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr9.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/s
+hare/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/public/stmaryrd/stmary9.pfb></usr/share/texl
+ive/texmf-dist/fonts/type1/public/xypic/xyatip10.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/xypic/xybtip10.pfb>
+Output written on cp2425t.pdf (15 pages, 745482 bytes).
 PDF statistics:
- 313 PDF objects out of 1000 (max. 8388607)
- 245 compressed objects within 3 object streams
- 36 named destinations out of 1000 (max. 500000)
+ 333 PDF objects out of 1000 (max. 8388607)
+ 260 compressed objects within 3 object streams
+ 38 named destinations out of 1000 (max. 500000)
  104 words of extra memory for PDF output out of 10000 (max. 10000000)
 
