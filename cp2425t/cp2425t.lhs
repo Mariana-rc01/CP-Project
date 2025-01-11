@@ -799,9 +799,49 @@ recExpr = baseExpr id id
 \end{code}
 
 \emph{Ana + cata + hylo}:
+
+Começando pelo catamorfismo de |Expr|, temos:
+
+\begin{eqnarray*}
+\start
+\just\equiv{ Cancelamento-cata }
+|
+    cata g . inT = g . fF (cata g)
+|
+\just\equiv{ Shunt-left }
+|
+    cata g = g . fF (cata g) . outT
+|
+\end{eqnarray*}
+
+Representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar[d]_-{|cataNat g|}
+           \ar[r]_-{|outNat|}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (cataNat g)))|}
+           \ar[l]_-{|inNat|}
+\\
+    |Expr C B|
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|g|}
+}
+\end{eqnarray*}
+
+Utilizando as funções previamente definidas, temos então:
+
 \begin{code}
 
 cataExpr g = g . recExpr (cataExpr g) . outExpr
+
+\end{code}
+
+\begin{code}
 
 anaExpr g = inExpr . recExpr (anaExpr g) . g
                 
