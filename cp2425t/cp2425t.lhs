@@ -892,6 +892,35 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
+A função |let_exp| é responsável por substituir todas as variáveis numa expressão |Expr| pelas suas correspondentes expressões
+atribuídas por uma função fornecida como argumento.
+
+A definição da função |let_exp| utiliza o catamorfismo |cataExpr|. No caso de encontrar uma variável (|V|), 
+a função |f| é usada para substituir essa variável pela expressão correspondente. Para valores 
+numéricos (|N|), a função mantém o valor inalterado. Para operadores (caso |T|), a função constrói uma nova expressão 
+que combina os resultados das subexpressões recursivamente.
+
+Em suma, |let_exp| avalia uma expressão ao substituir todas as variáveis pelas expressões correspondentes, garantindo 
+que a estrutura da expressão original é mantida. De seguida, o diagrama mostra como a operação do catamorfismo percorre e 
+transforma a expressão.
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar[d]_-{|let_exp f|}
+           \ar[r]_-{|outExpr|}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (let_exp f)))|}
+           \ar[l]_-{|inExpr|}
+\\
+    |Expr C B|
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|either f (either N (uncurry T))|}
+}
+\end{eqnarray*}
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:

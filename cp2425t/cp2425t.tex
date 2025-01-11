@@ -1106,6 +1106,35 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
+A função \ensuremath{\Varid{let\char95 exp}} é responsável por substituir todas as variáveis numa expressão \ensuremath{\Conid{Expr}} pelas suas correspondentes expressões
+atribuídas por uma função fornecida como argumento.
+
+A definição da função \ensuremath{\Varid{let\char95 exp}} utiliza o catamorfismo \ensuremath{\Varid{cataExpr}}. No caso de encontrar uma variável (\ensuremath{\Conid{V}}), 
+a função \ensuremath{\Varid{f}} é usada para substituir essa variável pela expressão correspondente. Para valores 
+numéricos (\ensuremath{\Conid{N}}), a função mantém o valor inalterado. Para operadores (caso \ensuremath{\Conid{T}}), a função constrói uma nova expressão 
+que combina os resultados das subexpressões recursivamente.
+
+Em suma, \ensuremath{\Varid{let\char95 exp}} avalia uma expressão ao substituir todas as variáveis pelas expressões correspondentes, garantindo 
+que a estrutura da expressão original é mantida. De seguida, o diagrama mostra como a operação do catamorfismo percorre e 
+transforma a expressão.
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\Varid{let\char95 exp}\;\Varid{f}}}
+           \ar[r]_-{\ensuremath{\Varid{outExpr}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;(\Varid{let\char95 exp}\;\Varid{f})))}}
+           \ar[l]_-{\ensuremath{\Varid{inExpr}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+           \ar[l]^-{\ensuremath{\alt{\Varid{f}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}}}
+}
+\end{eqnarray*}
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
