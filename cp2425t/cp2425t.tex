@@ -936,6 +936,8 @@ O seu tipo, neste contexto, é definido como: \ensuremath{\Varid{a}\mathbin{::}[
 
 \subsection*{Problema 4}
 
+Definição do tipo de \ensuremath{\Conid{Expr}}:
+
 Cálculo de outExpr:
 
 \begin{eqnarray*}
@@ -968,27 +970,28 @@ Ficando assim, em Haskell, com:
 \ColumnHook
 \end{hscode}\resethooks
 
-Cálculo de recExpr:
+Cálculo do functor de \ensuremath{\Conid{Expr}}:
 
+Sabendo que \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\Varid{f})}, temos que:
 
+\begin{eqnarray*}
+\start
+\ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\Varid{id},\Varid{f})}
+\just\equiv{ Def B }
+\ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}\Varid{id}\times\map \;\Varid{f})}
+\end{eqnarray*}
 
-Definição do tipo:
+Definindo \ensuremath{\Varid{recExpr}} como:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{outExpr}\mathbin{::}\Conid{Expr}\;\Varid{b}\;\Varid{a}\to \Varid{a}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Conid{Expr}\;\Varid{b}\;\Varid{a}\mskip1.5mu])){}\<[E]%
-\\
-\>[B]{}\Varid{outExpr}\;(\Conid{V}\;\Varid{n})\mathrel{=}i_1\;\Varid{n}{}\<[E]%
-\\
-\>[B]{}\Varid{outExpr}\;(\Conid{N}\;\Varid{n})\mathrel{=}(i_2\comp i_1)\;\Varid{n}{}\<[E]%
-\\
-\>[B]{}\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{exprs}){}\<[E]%
-\\[\blanklineskip]%
 \>[B]{}\Varid{recExpr}\mathbin{::}(\Varid{a}\to \Varid{b1})\to \Varid{b2}+(\Varid{b3}+(\Varid{b4},[\mskip1.5mu \Varid{a}\mskip1.5mu]))\to \Varid{b2}+(\Varid{b3}+(\Varid{b4},[\mskip1.5mu \Varid{b1}\mskip1.5mu])){}\<[E]%
 \\
 \>[B]{}\Varid{recExpr}\mathrel{=}\Varid{baseExpr}\;\Varid{id}\;\Varid{id}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
 \emph{Ana + cata + hylo}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%

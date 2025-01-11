@@ -716,6 +716,8 @@ convolve = undefined
 
 \subsection*{Problema 4}
 
+Definição do tipo de |Expr|:
+
 Cálculo de outExpr:
 
 \begin{eqnarray*}
@@ -772,22 +774,30 @@ outExpr (T op exprs) = (i2.i2) (op,exprs)
 
 \end{code}
 
-Cálculo de recExpr:
+Cálculo do functor de |Expr|:
 
+Sabendo que |F f = B(id, f)|, temos que:
 
+\begin{eqnarray*}
+\start
+|
+    F f = B(id, id, f)
+|
+\just\equiv{ Def B }
+|
+    F f = id + (id + id >< map f)
+|
+\end{eqnarray*}
 
-Definição do tipo:
+Definindo |recExpr| como:
+
 \begin{code}
-
-outExpr :: Expr b a -> Either a (Either b (Op, [Expr b a]))
-outExpr (V n) = i1 n
-outExpr (N n) = (i2.i1) n
-outExpr (T op exprs) = (i2.i2) (op,exprs)
 
 recExpr :: (a -> b1) -> Either b2 (Either b3 (b4, [a])) -> Either b2 (Either b3 (b4, [b1]))
 recExpr = baseExpr id id
 
 \end{code}
+
 \emph{Ana + cata + hylo}:
 \begin{code}
 
