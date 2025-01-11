@@ -582,6 +582,72 @@ f2 (n, ((_, ll), (_, lr))) = (hIndex, contributors)
 \end{code}
 
 \subsection*{Problema 2}
+
+A função primes é responsável por criar a lista de fatores primos de um dado número. De modo que, esta função pode ser definida
+como um anamorfismo de listas (|List|). Assim, o diagrama que representa a operação é o seguinte:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Integer|^*
+           \ar[d]_-{|anaList g|}
+            \ar[r]_-{|outList|} 
+&
+    |1 + Integer| \times |Integer|^*
+           \ar[d]^{|id + (id| \times |anaList g|)}
+           \ar[l]_-{|inList|}
+\\
+     |Integer|
+&
+     |1 + Integer| \times |Integer|
+           \ar[l]^-{|g|}
+}
+\end{eqnarray*}
+
+A implementação baseia-se em decompor o número repetidamente no seu menor fator primo, este processo repete-se até que o quociente resultante seja 1.
+
+O processo pode ser representado graficamente como se segue para o número 455:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |455|
+        \ar[d]
+\\
+    |(5,91)|
+        \ar[d]
+\\
+    |(7,13)|
+        \ar[d]
+\\
+    |(13,1)|
+        \ar[d]
+\\
+    |[]|
+}
+\end{eqnarray*}
+
+Assim, |primes 455 = [5,7,13]|.
+
+A definição de |primes| como |anaList g| tira partido de que um anamorfismo constrói uma estrutura recursiva ao aplicar sucessivamente o gene |g| a um valor inicial.
+O gene |g| determina como cada passo da construção ocorre, neste caso |g| divide o número |n| no seu menor fator primo (calculado pela função |smallestPrimeFactor|) e no quociente resultante após a divisão.
+O processo termina quando |n=1|, porque não existem mais fatores primos para serem determinados.
+
+A função |smallestPrimeFactor| é responsável por determinar o menor fator primo de um número |n|, e é definida como um catamorfismo de naturais (|catNat|).
+Esta função aplica sucessivamente a lógica de "testar se um divisor |d| divide |n|" para valores |d| crescentes, assim inicia com o menor número primo (|2|).
+
+O ciclo-for contém uma estrutura recursiva que verifica duas condições:
+
+1. \textbf{Teste de primalidade:} Se \begin{math} d^2 > n\end{math}: Nesse caso, |n| é primo e o seu menor fator primo é ele mesmo (o processo termina).
+
+2. \textbf{Encontrar o menor fator primo:} Se \begin{math}n\mod d = 0\end{math}: Nesse caso, |d| é o menor fator primo de |n|.
+
+\textbf{Caso contrário:} Incrementámos |d| e continuámos o processo.
+\paragraph{}
+\textbf{Fundamentação matemática:}
+A implementação baseia-se no Teorema Fundamental da Aritmética, que garante que todo o número inteiro positivo maior que 1
+pode ser decomposto de forma única como um produto de fatores primos.
+O processo descrito no gene |g| utiliza esta propriedade para decompor iterativamente o |n| nos seus fatores primos,
+onde a divisibilidade é verificada e avançamos na procura do menor fator primo.
+
 Primeira parte:
 \begin{code}
 
@@ -593,6 +659,8 @@ g n = i2 (smallestPrimeFactor n, div n (smallestPrimeFactor n))
 
 primes = anaList g
 \end{code}
+
+
 Segunda parte:
 \begin{code}
 prime_tree = Term 1 . untar . map (\n -> (primes n, n))

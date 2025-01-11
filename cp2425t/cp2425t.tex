@@ -791,6 +791,72 @@ que sejam necessárias.
 \end{hscode}\resethooks
 
 \subsection*{Problema 2}
+
+A função primes é responsável por criar a lista de fatores primos de um dado número. De modo que, esta função pode ser definida
+como um anamorfismo de listas (\ensuremath{\Conid{List}}). Assim, o diagrama que representa a operação é o seguinte:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\mathbb{Z}}^*
+           \ar[d]_-{\ensuremath{\anaList{\Varid{g}}}}
+            \ar@/_/[r]_-{\ensuremath{\Varid{outList}}} 
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}^*
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
+           \ar@/_/[l]_-{\ensuremath{\Varid{inList}}}
+\\
+     \ensuremath{\mathbb{Z}}
+&
+     \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}
+           \ar[l]^-{\ensuremath{\Varid{g}}}
+}
+\end{eqnarray*}
+
+A implementação baseia-se em decompor o número repetidamente no seu menor fator primo, este processo repete-se até que o quociente resultante seja 1.
+
+O processo pode ser representado graficamente como se segue para o número 455:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\mathrm{455}}
+        \ar[d]
+\\
+    \ensuremath{(\mathrm{5},\mathrm{91})}
+        \ar[d]
+\\
+    \ensuremath{(\mathrm{7},\mathrm{13})}
+        \ar[d]
+\\
+    \ensuremath{(\mathrm{13},\mathrm{1})}
+        \ar[d]
+\\
+    \ensuremath{[\mskip1.5mu \mskip1.5mu]}
+}
+\end{eqnarray*}
+
+Assim, \ensuremath{\Varid{primes}\;\mathrm{455}\mathrel{=}[\mskip1.5mu \mathrm{5},\mathrm{7},\mathrm{13}\mskip1.5mu]}.
+
+A definição de \ensuremath{\Varid{primes}} como \ensuremath{\anaList{\Varid{g}}} tira partido de que um anamorfismo constrói uma estrutura recursiva ao aplicar sucessivamente o gene \ensuremath{\Varid{g}} a um valor inicial.
+O gene \ensuremath{\Varid{g}} determina como cada passo da construção ocorre, neste caso \ensuremath{\Varid{g}} divide o número \ensuremath{\Varid{n}} no seu menor fator primo (calculado pela função \ensuremath{\Varid{smallestPrimeFactor}}) e no quociente resultante após a divisão.
+O processo termina quando \ensuremath{\Varid{n}\mathrel{=}\mathrm{1}}, porque não existem mais fatores primos para serem determinados.
+
+A função \ensuremath{\Varid{smallestPrimeFactor}} é responsável por determinar o menor fator primo de um número \ensuremath{\Varid{n}}, e é definida como um catamorfismo de naturais (\ensuremath{\Varid{catNat}}).
+Esta função aplica sucessivamente a lógica de "testar se um divisor \ensuremath{\Varid{d}} divide \ensuremath{\Varid{n}}" para valores \ensuremath{\Varid{d}} crescentes, assim inicia com o menor número primo (\ensuremath{\mathrm{2}}).
+
+O ciclo-for contém uma estrutura recursiva que verifica duas condições:
+
+1. \textbf{Teste de primalidade:} Se \begin{math} d^2 > n\end{math}: Nesse caso, \ensuremath{\Varid{n}} é primo e o seu menor fator primo é ele mesmo (o processo termina).
+
+2. \textbf{Encontrar o menor fator primo:} Se \begin{math}n\mod d = 0\end{math}: Nesse caso, \ensuremath{\Varid{d}} é o menor fator primo de \ensuremath{\Varid{n}}.
+
+\textbf{Caso contrário:} Incrementámos \ensuremath{\Varid{d}} e continuámos o processo.
+\paragraph{}
+\textbf{Fundamentação matemática:}
+A implementação baseia-se no Teorema Fundamental da Aritmética, que garante que todo o número inteiro positivo maior que 1
+pode ser decomposto de forma única como um produto de fatores primos.
+O processo descrito no gene \ensuremath{\Varid{g}} utiliza esta propriedade para decompor iterativamente o \ensuremath{\Varid{n}} nos seus fatores primos,
+onde a divisibilidade é verificada e avançamos na procura do menor fator primo.
+
 Primeira parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
