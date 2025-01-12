@@ -1002,7 +1002,7 @@ hyloExpr h g = cataExpr h . anaExpr g
 
 \end{code}
 
-\emph{Monad}:
+2. \emph{Monad}:
 
 Para declarar |Expr b| como instância da classe |Monad|, foram implementadas as intâncias de |Functor|, |Applicative| e |Monad| do tipo |Expr b|.
 A abordagem utilizada foi guiada pelo exercício 4 da ficha 12, adaptando ao contexto específico de |Expr b|.
@@ -1157,6 +1157,81 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
+3. \emph{Catamorifsmo monádico}
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar[d]_-{|cataNat g|}
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (cataNat g)))|}
+           \ar@@/^-1pc/[l]_-{|inNat |}
+\\
+    |Expr C B|
+           \ar[d]_-{|u|}
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|g|}
+           \ar[d]^{|id + (id + (id >< map u))|}
+\\
+    |m (Expr C B)|
+&
+    |A + (C + (Op >< (m (Expr C A))|^*))
+            \ar[l]^-{|h|}
+}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar[d]_-{|cataNat g|}
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (cataNat g)))|}
+           \ar@@/^-1pc/[l]_-{|inNat |}
+\\
+    |m (Expr C B)|
+&
+    |A + (C + (Op >< (m (Expr C A))|^*))
+            \ar[l]^-{[h_1, h_2]}
+}
+\end{eqnarray*}
+
+Para definir o catamorfismo monádico de |Expr|, a função |mcataExpr|, começamos por entender o papel fundamental da função |dl|, que é responsável por transformar a estrutura de |Expr| num contexto monádico. Esta transformação permite que o processamento das expressões ocorra dentro de um monad.
+
+A função |dl| é definida como:
+
+\begin{code}
+
+dl :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
+dl = either (return . i1) (either (return . i2 . i1) aux)
+    where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
+
+\end{code}
+
+- No caso de um valor do tipo |a|, a função simplesmente o encapsula no monad utilizando |return . i1|.
+
+- No caso de um valor do tipo |b|, o mesmo ocorre, utilizando |return . i2 . i1|.
+
+- No caso de uma operação (|Op|) acompanhada por uma lista de valores monádicos (|[m c]|), é usada a função auxiliar |aux|.
+
+Dentro de |aux|, a função |lamb| é utilizada para distribuir o monad pela lista. Em seguida, o resultado é encapsulado novamente na estrutura esperada pelo tipo |m (Either a (Either b (Op, m [c])))|.
+
+A função |mcataExpr|, que define o catamorfismo monádico propriamente dito, é então definida da seguinte forma:
+
+\begin{code}
+
+mcataExpr :: Monad m => (Either a (Either b (Op, m [c])) -> m c) -> Expr b a -> m c
+mcataExpr g = g .! (dl . recExpr (mcataExpr g) . outExpr)
+
+\end{code}
+
+Esta definição, assemelha-se à definição do catamorfismo simples, com a diferença de que a função |dl| é usada para distribuir o monad sobre a lista de subexpressões.
+
+4.
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
