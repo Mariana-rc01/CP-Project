@@ -790,7 +790,58 @@ anaGene l1 l2 = cond (>= m + n - 1) (const $ i1 ())
 \end{code}
 
 \subsection*{Problema 4}
-Definição do tipo:
+
+1. Nesta pergunta, pretende-se definir por completo, a biblioteca |Expr|, à semelhança das outras bibliotecas de estruturas fornecidas.
+
+Definição do tipo de |Expr|:
+
+Para o cálulo de |outExpr|, partimos da afirmação |outExpr . inExpr = id|,
+
+\begin{eqnarray*}
+\start
+|
+     outExpr . inExpr = id
+|
+\just\equiv{def inExpr}
+|
+     outExpr . either V (either N (uncurry T)) = id
+|
+\just\equiv{ fusão + }
+|
+     either (outExpr . V) (either (outExpr . N) (outExpr . uncurry T)) = id
+|
+\just\equiv{ universal +, natural id }
+|
+    lcbr(
+          outExpr . V = i1
+     )(
+          either (outExpr . N) (outExpr . uncurry T) = i2
+     )
+|
+\just\equiv{ universal + }
+|
+    lcbr3(
+          outExpr . V = i1
+     )(
+          outExpr . N = i2 . i1
+     )(
+          outExpr . uncurry T = i2 . i2
+     )
+|
+\just\equiv{ igualdade extensional, def-comp, uncurry }
+|
+    lcbr3(
+          outExpr (V n) = i1 n
+     )(
+          outExpr (N n) = (i2 . i1) n
+     )(
+          outExpr (T op exprs) = (i2 . i2) (op, exprs)
+     )
+|
+\end{eqnarray*}
+
+Ficando assim, em Haskell, com:
+
 \begin{code}
 
 outExpr :: Expr b a -> Either a (Either b (Op, [Expr b a]))
@@ -798,20 +849,159 @@ outExpr (V n) = i1 n
 outExpr (N n) = (i2.i1) n
 outExpr (T op exprs) = (i2.i2) (op,exprs)
 
+\end{code}
+
+Cálculo do functor de |Expr|:
+
+Sabendo que |F f = B(id, f)|, temos que:
+
+\begin{eqnarray*}
+\start
+|
+    F f = B(id, id, f)
+|
+\just\equiv{ def B }
+|
+    F f = id + (id + id >< map f)
+|
+\end{eqnarray*}
+
+Definindo, então, |recExpr| como:
+
+\begin{code}
+
 recExpr :: (a -> b1) -> Either b2 (Either b3 (b4, [a])) -> Either b2 (Either b3 (b4, [b1]))
 recExpr = baseExpr id id
 
 \end{code}
-\emph{Ana + cata + hylo}:
+
+Definição da triologia ana-cata-hylo:
+
+Começando pelo catamorfismo de |Expr|, temos:
+
+\begin{eqnarray*}
+\start
+\just\equiv{ cancelamento-cata }
+|
+    cata g . inT = g . fF (cata g)
+|
+\just\equiv{ shunt-left }
+|
+    cata g = g . fF (cata g) . outT
+|
+\end{eqnarray*}
+
+Representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar[d]_-{|cataNat g|}
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (cataNat g)))|}
+           \ar@@/^-1pc/[l]_-{|inNat |}
+\\
+    |Expr C B|
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|g|}
+}
+\end{eqnarray*}
+
+Utilizando as funções previamente definidas, temos então:
+
 \begin{code}
 
 cataExpr g = g . recExpr (cataExpr g) . outExpr
 
+\end{code}
+
+Para o anamorfismo de |Expr|, temos:
+
+\begin{eqnarray*}
+\start
+\just\equiv{ cancelamento-ana }
+|
+    outT . ana g = fF (ana g) . g
+|
+\just\equiv{ shunt-right }
+|
+    ana g = inT . fF (ana g) . g
+|
+\end{eqnarray*}
+
+Representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar@@/^-1pc/[l]_-{|inNat |}
+\\
+    |Expr C D|
+            \ar[u]^-{|ana g|}
+            \ar[r]_-{|g|}
+&
+    |A + (C + (Op >< (Expr C D)|^*))
+            \ar[u]_-{|id + (id + (id >< map (ana g)))|}
+}
+\end{eqnarray*}
+
+Utilizando as funções previamente definidas, temos então:
+
+\begin{code}
+
 anaExpr g = inExpr . recExpr (anaExpr g) . g
+
+\end{code}
+
+Sendo o hilomorfismo, a composição do catamorfismo e do anamorfismo, representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C D|
+           \ar[d]_-{|ana g|}
+           \ar[r]_-{| g |}
+&
+    |A + (C + (Op >< (Expr C D)|^*))
+           \ar[d]^{|id + (id + (id >< map (ana g)))|}
+\\
+    |Expr C A|
+           \ar[d]_-{|cataNat h|}
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (cataNat h)))|}
+           \ar@@/^-1pc/[l]_-{|inNat |}
+\\
+    |Expr C B|
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|h|}
+}
+\end{eqnarray*}
+
+ou seja,
+
+\begin{eqnarray*}
+\start
+|
+    hylo h g = cata h . ana g
+|
+\end{eqnarray*}
+
+Este é definido em Haskell usando as funções |cataExpr| e |anaExpr| previamente definidas:
+
+\begin{code}
                 
 hyloExpr h g = cataExpr h . anaExpr g
 
 \end{code}
+
 \emph{Monad}:
 
 Para declarar |Expr b| como instância da classe |Monad|, foram implementadas as intâncias de |Functor|, |Applicative| e |Monad| do tipo |Expr b|.

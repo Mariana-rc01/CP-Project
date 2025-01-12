@@ -1028,7 +1028,30 @@ O seu tipo, neste contexto, é definido como: \ensuremath{\Varid{a}\mathbin{::}[
 \end{hscode}\resethooks
 
 \subsection*{Problema 4}
-Definição do tipo:
+
+1. Nesta pergunta, pretende-se definir por completo, a biblioteca \ensuremath{\Conid{Expr}}, à semelhança das outras bibliotecas de estruturas fornecidas.
+
+Definição do tipo de \ensuremath{\Conid{Expr}}:
+
+Para o cálulo de \ensuremath{\Varid{outExpr}}, partimos da afirmação \ensuremath{\Varid{outExpr}\comp \Varid{inExpr}\mathrel{=}\Varid{id}},
+
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{outExpr}\comp \Varid{inExpr}\mathrel{=}\Varid{id}}
+\just\equiv{def inExpr}
+\ensuremath{\Varid{outExpr}\comp \alt{\Conid{V}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}\mathrel{=}\Varid{id}}
+\just\equiv{ fusão + }
+\ensuremath{\alt{\Varid{outExpr}\comp \Conid{V}}{\alt{\Varid{outExpr}\comp \Conid{N}}{\Varid{outExpr}\comp \uncurry{\Conid{T}}}}\mathrel{=}\Varid{id}}
+\just\equiv{ universal +, natural id }
+\ensuremath{\begin{lcbr}\Varid{outExpr}\comp \Conid{V}\mathrel{=}i_1\\\alt{\Varid{outExpr}\comp \Conid{N}}{\Varid{outExpr}\comp \uncurry{\Conid{T}}}\mathrel{=}i_2\end{lcbr}}
+\just\equiv{ universal + }
+\ensuremath{\begin{lcbr}\Varid{outExpr}\comp \Conid{V}\mathrel{=}i_1\\\Varid{outExpr}\comp \Conid{N}\mathrel{=}i_2\comp i_1\\\Varid{outExpr}\comp \uncurry{\Conid{T}}\mathrel{=}i_2\comp i_2\end{lcbr}}
+\just\equiv{ igualdade extensional, def-comp, uncurry }
+\ensuremath{\begin{lcbr}\Varid{outExpr}\;(\Conid{V}\;\Varid{n})\mathrel{=}i_1\;\Varid{n}\\\Varid{outExpr}\;(\Conid{N}\;\Varid{n})\mathrel{=}(i_2\comp i_1)\;\Varid{n}\\\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{exprs})\end{lcbr}}
+\end{eqnarray*}
+
+Ficando assim, em Haskell, com:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1039,23 +1062,151 @@ Definição do tipo:
 \>[B]{}\Varid{outExpr}\;(\Conid{N}\;\Varid{n})\mathrel{=}(i_2\comp i_1)\;\Varid{n}{}\<[E]%
 \\
 \>[B]{}\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{exprs}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Cálculo do functor de \ensuremath{\Conid{Expr}}:
+
+Sabendo que \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\Varid{f})}, temos que:
+
+\begin{eqnarray*}
+\start
+\ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\Varid{id},\Varid{f})}
+\just\equiv{ def B }
+\ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}\Varid{id}\times\map \;\Varid{f})}
+\end{eqnarray*}
+
+Definindo, então, \ensuremath{\Varid{recExpr}} como:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{recExpr}\mathbin{::}(\Varid{a}\to \Varid{b1})\to \Varid{b2}+(\Varid{b3}+(\Varid{b4},[\mskip1.5mu \Varid{a}\mskip1.5mu]))\to \Varid{b2}+(\Varid{b3}+(\Varid{b4},[\mskip1.5mu \Varid{b1}\mskip1.5mu])){}\<[E]%
 \\
 \>[B]{}\Varid{recExpr}\mathrel{=}\Varid{baseExpr}\;\Varid{id}\;\Varid{id}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\emph{Ana + cata + hylo}:
+
+Definição da triologia ana-cata-hylo:
+
+Começando pelo catamorfismo de \ensuremath{\Conid{Expr}}, temos:
+
+\begin{eqnarray*}
+\start
+\just\equiv{ cancelamento-cata }
+\ensuremath{\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \mathsf{in}\mathrel{=}\Varid{g}\comp \fun F \;\llparenthesis\, \Varid{g}\,\rrparenthesis}
+\just\equiv{ shunt-left }
+\ensuremath{\llparenthesis\, \Varid{g}\,\rrparenthesis\mathrel{=}\Varid{g}\comp \fun F \;\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \mathsf{out}}
+\end{eqnarray*}
+
+Representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\cataNat{\Varid{g}}}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{g}}))}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+           \ar[l]^-{\ensuremath{\Varid{g}}}
+}
+\end{eqnarray*}
+
+Utilizando as funções previamente definidas, temos então:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{cataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\comp \Varid{recExpr}\;(\Varid{cataExpr}\;\Varid{g})\comp \Varid{outExpr}{}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Para o anamorfismo de \ensuremath{\Conid{Expr}}, temos:
+
+\begin{eqnarray*}
+\start
+\just\equiv{ cancelamento-ana }
+\ensuremath{\mathsf{out}\comp \ana{\Varid{g}}\mathrel{=}\fun F \;\ana{\Varid{g}}\comp \Varid{g}}
+\just\equiv{ shunt-right }
+\ensuremath{\ana{\Varid{g}}\mathrel{=}\mathsf{in}\comp \fun F \;\ana{\Varid{g}}\comp \Varid{g}}
+\end{eqnarray*}
+
+Representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{D}}
+            \ar[u]^-{\ensuremath{\ana{\Varid{g}}}}
+            \ar[r]_-{\ensuremath{\Varid{g}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{D})}^*))
+            \ar[u]_-{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\ana{\Varid{g}}))}}
+}
+\end{eqnarray*}
+
+Utilizando as funções previamente definidas, temos então:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{anaExpr}\;\Varid{g}\mathrel{=}\Varid{inExpr}\comp \Varid{recExpr}\;(\Varid{anaExpr}\;\Varid{g})\comp \Varid{g}{}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Sendo o hilomorfismo, a composição do catamorfismo e do anamorfismo, representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{D}}
+           \ar[d]_-{\ensuremath{\ana{\Varid{g}}}}
+           \ar[r]_-{\ensuremath{\Varid{g}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{D})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\ana{\Varid{g}}))}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\cataNat{\Varid{h}}}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{h}}))}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+           \ar[l]^-{\ensuremath{\Varid{h}}}
+}
+\end{eqnarray*}
+
+ou seja,
+
+\begin{eqnarray*}
+\start
+\ensuremath{\llbracket\, \Varid{h},\,\Varid{g}\,\rrbracket\mathrel{=}\llparenthesis\, \Varid{h}\,\rrparenthesis\comp \ana{\Varid{g}}}
+\end{eqnarray*}
+
+Este é definido em Haskell usando as funções \ensuremath{\Varid{cataExpr}} e \ensuremath{\Varid{anaExpr}} previamente definidas:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{hyloExpr}\;\Varid{h}\;\Varid{g}\mathrel{=}\Varid{cataExpr}\;\Varid{h}\comp \Varid{anaExpr}\;\Varid{g}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
 \emph{Monad}:
 
 Para declarar \ensuremath{\Conid{Expr}\;\Varid{b}} como instância da classe \ensuremath{\Conid{Monad}}, foram implementadas as intâncias de \ensuremath{\Conid{Functor}}, \ensuremath{\Conid{Applicative}} e \ensuremath{\Conid{Monad}} do tipo \ensuremath{\Conid{Expr}\;\Varid{b}}.
