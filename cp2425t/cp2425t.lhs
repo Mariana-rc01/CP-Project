@@ -774,6 +774,35 @@ O seu tipo, neste contexto, é definido como: | a :: [Either Integer (Integer, [
 
 \subsection*{Problema 3}
 
+A função |convolve| foi implementada como um anamorfismo de listas (|List|), já que a função é responsável por criar a lista resultante da convolução de 2 listas fornecidas, |l1| e |l2|.
+Esta vai construindo recursivamente a lista resultado recorrendo à função |anaList|, aplicando sucessivamente  às duas listas o gene |g| que, neste caso, está realmente construído na função |anaGene|.
+
+A função |anaGene| começa por verificar se o índice |i| (inicialmente 0) ainda se encontra dentro dos limites da convolução, isto é, se |i >= m + n - 1|. Se isto se verificar, será retornada uma lista vazia, visto que a convolução terminou, não sendo adicionado nenhum valor novo à lista final.
+Caso contrário, será calculado o elemento seguinte da lista resultado, realizando efetivamente o próximo passo da convolução: |sum $ zipWith (*) l1 (map (\j -> access (l2, (i, j))) [0..(m - 1)])|
+
+Além disso, neste cálculo, é verificado se o índice |i-j| de |l2| é válido, através da função |access|, onde duas condições são confirmadas: |i-j| tem de ser não negativo (|uncurry (>).(const 0 >< uncurry (-))|) e menor que o comprimento de |l2| (|uncurry (<=).(length >< uncurry (-))|).
+
+A função |convolve| é representada pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Integer|^* \times |Integer|^*
+           \ar[d]_-{|anaList g|}
+            \ar[r]^-{|g|} 
+&
+    |1 + Integer| \times (|Integer|^* \times |Integer|^*)
+           \ar[d]^{|id + (id| \times |anaList g|)}
+\\
+     |Integer|^*
+            \ar@@/_/[r]_-{|out|_|List|} 
+&
+     |1 + Integer| \times |Integer|^*
+           \ar@@/_/[l]_-{|in|_|List|}
+}
+\end{eqnarray*}
+
+A implementação da função |convolve| realizada foi a seguinte:
+
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
 convolve l1 l2 = anaList (anaGene l1 l2) 0
