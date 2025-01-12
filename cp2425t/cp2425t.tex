@@ -1207,7 +1207,7 @@ Este é definido em Haskell usando as funções \ensuremath{\Varid{cataExpr}} e 
 \ColumnHook
 \end{hscode}\resethooks
 
-\emph{Monad}:
+2. \emph{Monad}:
 
 Para declarar \ensuremath{\Conid{Expr}\;\Varid{b}} como instância da classe \ensuremath{\Conid{Monad}}, foram implementadas as intâncias de \ensuremath{\Conid{Functor}}, \ensuremath{\Conid{Applicative}} e \ensuremath{\Conid{Monad}} do tipo \ensuremath{\Conid{Expr}\;\Varid{b}}.
 A abordagem utilizada foi guiada pelo exercício 4 da ficha 12, adaptando ao contexto específico de \ensuremath{\Conid{Expr}\;\Varid{b}}.
@@ -1350,6 +1350,52 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
+3. \emph{Catamorifsmo monádico}
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\cataNat{\Varid{g}}}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{g}}))}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+           \ar[d]_-{\ensuremath{\Varid{u}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+           \ar[l]^-{\ensuremath{\Varid{g}}}
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\Varid{u}))}}
+\\
+    \ensuremath{\Varid{m}\;(\Conid{Expr}\;\Conid{C}\;\Conid{B})}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Varid{m}\;(\Conid{Expr}\;\Conid{C}\;\Conid{A}))}^*))
+            \ar[l]^-{\ensuremath{\Varid{h}}}
+}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\cataNat{\Varid{g}}}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{g}}))}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
+\\
+    \ensuremath{\Varid{m}\;(\Conid{Expr}\;\Conid{C}\;\Conid{B})}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Varid{m}\;(\Conid{Expr}\;\Conid{C}\;\Conid{A}))}^*))
+            \ar[l]^-{[h_1, h_2]}
+}
+\end{eqnarray*}
+
+Para definir o catamorfismo monádico de \ensuremath{\Conid{Expr}}, a função \ensuremath{\Varid{mcataExpr}}, começamos por definir a função \ensuremath{\Varid{dl'}}, que é responsável por transformar a estrutura de \ensuremath{\Conid{Expr}} para um contexto monádico.
+
+4.
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:

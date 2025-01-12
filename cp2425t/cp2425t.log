@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.10)  12 JAN 2025 12:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.10)  12 JAN 2025 13:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1133,7 +1133,7 @@ File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count352
 \l__pdf_internal_box=\box77
 )
-No file cp2425t.aux.
+(./cp2425t.aux)
 \openout1 = `cp2425t.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 279.
@@ -1155,7 +1155,7 @@ LaTeX Font Info:    ... okay on input line 279.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 279.
 LaTeX Font Info:    ... okay on input line 279.
 Package hyperref Info: Link coloring ON on input line 279.
-(./cp2425t.out) (./cp2425t.out)
+ (./cp2425t.out) (./cp2425t.out)
 \@outlinefile=\write8
 \openout8 = `cp2425t.out'.
 
@@ -1305,14 +1305,9 @@ media/EE.jpg>])
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-
-
-LaTeX Warning: Reference `sec:documentacao' on page 1 undefined on input line 3
-06.
-
 \openout7 = `cp2425t.ptb'.
 
-<cp2425t_media/histogram.jpg, id=47, 1101.11375pt x 895.345pt>
+<cp2425t_media/histogram.jpg, id=48, 1101.11375pt x 895.345pt>
 File: cp2425t_media/histogram.jpg Graphic file (type jpg)
 <use cp2425t_media/histogram.jpg>
 Package pdftex.def Info: cp2425t_media/histogram.jpg  used on input line 328.
@@ -1367,14 +1362,6 @@ Package pdftex.def Info: cp2425t_media/treeA.png  used on input line 442.
 (pdftex.def)             Requested size: 140.84258pt x 172.979pt.
 \openout7 = `cp2425t.ptb'.
 
-
-
-LaTeX Warning: Reference `sec:codigo' on page 3 undefined on input line 463.
-
-
-LaTeX Warning: Reference `sec:resolucao' on page 3 undefined on input line 467.
-
-
 \openout7 = `cp2425t.ptb'.
 
 
@@ -1389,7 +1376,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 \openout7 = `cp2425t.ptb'.
 
-<cp2425t_media/treeB.png, id=84, 415.5525pt x 551.05875pt>
+<cp2425t_media/treeB.png, id=87, 415.5525pt x 551.05875pt>
 File: cp2425t_media/treeB.png Graphic file (type png)
 <use cp2425t_media/treeB.png>
 Package pdftex.def Info: cp2425t_media/treeB.png  used on input line 508.
@@ -1406,10 +1393,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  []
 
 [4 <./cp2425t_media/treeB.png>]
-
-LaTeX Warning: Citation `Kn92' on page 5 undefined on input line 573.
-
-<cp2425t_media/lhs.jpg, id=102, 1557.82pt x 967.615pt>
+<cp2425t_media/lhs.jpg, id=106, 1557.82pt x 967.615pt>
 File: cp2425t_media/lhs.jpg Graphic file (type jpg)
 <use cp2425t_media/lhs.jpg>
 Package pdftex.def Info: cp2425t_media/lhs.jpg  used on input line 592.
@@ -1420,18 +1404,6 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  []
 
 [5 <./cp2425t_media/lhs.jpg>]
-
-LaTeX Warning: Reference `sec:resolucao' on page 6 undefined on input line 651.
-
-
-
-LaTeX Warning: Reference `sec:codigo' on page 6 undefined on input line 664.
-
-
-LaTeX Warning: Reference `sec:diagramas' on page 6 undefined on input line 670.
-
-
-
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
@@ -1545,14 +1517,12 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[15] <xymatrix 2x2 249>
+[15] <xymatrix 2x3 386> <xymatrix 2x2 249>
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[16]
-\openout7 = `cp2425t.ptb'.
-
+[16] <xymatrix 2x2 249>
 \openout7 = `cp2425t.ptb'.
 
 \openout7 = `cp2425t.ptb'.
@@ -1562,7 +1532,10 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[17] (./cp2425t.ind
+[17]
+\openout7 = `cp2425t.ptb'.
+
+ (./cp2425t.ind
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
@@ -1594,20 +1567,17 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `cp2425t.out' has not changed.
 (rerunfilecheck)             Checksum: 77E1DCEE2046690F1FC223B6C42FC6FD;1148.
  ) 
 Here is how much of TeX's memory you used:
- 47834 strings out of 476106
- 1046799 string characters out of 5793933
- 1948975 words of memory out of 5000000
- 69123 multiletter control sequences out of 15000+600000
- 792377 words of font info for 150 fonts, out of 8000000 for 9000
+ 47838 strings out of 476106
+ 1046875 string characters out of 5793933
+ 1951975 words of memory out of 5000000
+ 69124 multiletter control sequences out of 15000+600000
+ 792788 words of font info for 151 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 99i,19n,101p,3281b,856s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,19n,101p,3281b,855s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/paratype/ptserif/PTF55F.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/paratype/ptserif/PTF56F.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/paratype/ptserif/PTF75F.pfb></usr/share/texlive/te
@@ -1629,10 +1599,10 @@ e/texlive/texmf-dist/fonts/type1/public/stmaryrd/stmary10.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/public/stmaryrd/stmary9.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/public/xypic/xyatip10.pfb></usr/share/texlive/texmf-dist/font
 s/type1/public/xypic/xybtip10.pfb>
-Output written on cp2425t.pdf (21 pages, 774686 bytes).
+Output written on cp2425t.pdf (21 pages, 776684 bytes).
 PDF statistics:
- 362 PDF objects out of 1000 (max. 8388607)
- 279 compressed objects within 3 object streams
+ 369 PDF objects out of 1000 (max. 8388607)
+ 286 compressed objects within 3 object streams
  44 named destinations out of 1000 (max. 500000)
  104 words of extra memory for PDF output out of 10000 (max. 10000000)
 
