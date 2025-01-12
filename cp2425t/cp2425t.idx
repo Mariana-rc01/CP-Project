@@ -83,100 +83,107 @@
 \indexentry{Função!$\pi _2$|hyperpage}{11}
 \indexentry{Função!\emph  {map}|hyperpage}{11}
 \indexentry{Combinador ``pointfree''!\emph  {ana}!Listas|hyperpage}{12}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{12}
+\indexentry{Função!\emph  {length}|hyperpage}{12}
+\indexentry{Função!\emph  {length}|hyperpage}{12}
 \indexentry{Função!\emph  {map}|hyperpage}{12}
 \indexentry{Função!\emph  {uncurry}|hyperpage}{12}
 \indexentry{Função!\emph  {uncurry}|hyperpage}{12}
 \indexentry{Função!\emph  {uncurry}|hyperpage}{12}
 \indexentry{Função!\emph  {length}|hyperpage}{12}
 \indexentry{Função!\emph  {uncurry}|hyperpage}{12}
-\indexentry{Combinador ``pointfree''!\emph  {ana}!Listas|hyperpage}{12}
-\indexentry{Combinador ``pointfree''!\emph  {ana}!Listas|hyperpage}{12}
-\indexentry{Combinador ``pointfree''!\emph  {ana}!Listas|hyperpage}{12}
-\indexentry{Função!\emph  {map}|hyperpage}{12}
-\indexentry{Função!\emph  {length}|hyperpage}{12}
-\indexentry{Função!\emph  {length}|hyperpage}{12}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{12}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{12}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{12}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{12}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{12}
-\indexentry{Função!\emph  {length}|hyperpage}{12}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{12}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{13}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{13}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{13}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{13}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{13}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Combinador ``pointfree''!\emph  {ana}!Listas|hyperpage}{13}
 \indexentry{Função!\emph  {map}|hyperpage}{13}
-\indexentry{Functor|hyperpage}{13}
-\indexentry{Functor|hyperpage}{13}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{14}
+\indexentry{Função!\emph  {length}|hyperpage}{13}
+\indexentry{Função!\emph  {length}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Função!\emph  {length}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Combinador ``pointfree''!\emph  {ana}!Listas|hyperpage}{13}
+\indexentry{Função!\emph  {length}|hyperpage}{13}
+\indexentry{Função!\emph  {length}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{13}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{13}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{13}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{14}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{14}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{14}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{14}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{14}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{14}
 \indexentry{Função!\emph  {map}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
 \indexentry{Functor|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
 \indexentry{Functor|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
-\indexentry{Função!\emph  {map}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
-\indexentry{Função!\emph  {map}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{14}
-\indexentry{Função!\emph  {map}|hyperpage}{14}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{14}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{15}
+\indexentry{Função!\emph  {map}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Functor|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Functor|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
 \indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
 \indexentry{Função!\emph  {map}|hyperpage}{15}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{15}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Função!\emph  {map}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{15}
+\indexentry{Função!\emph  {map}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {ana}|hyperpage}{15}
+\indexentry{Função!\emph  {map}|hyperpage}{16}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{16}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{17}
-\indexentry{Função!\emph  {map}|hyperpage}{17}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{17}
-\indexentry{Função!\emph  {map}|hyperpage}{17}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{17}
-\indexentry{Função!\emph  {map}|hyperpage}{17}
-\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{17}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{17}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{18}
 \indexentry{Função!\emph  {map}|hyperpage}{18}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{18}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{18}
+\indexentry{Função!\emph  {map}|hyperpage}{18}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{18}
+\indexentry{Função!\emph  {map}|hyperpage}{18}
+\indexentry{Combinador ``pointfree''!\emph  {cata}!Naturais|hyperpage}{18}
+\indexentry{Functor|hyperpage}{18}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
-\indexentry{Função!\emph  {uncurry}|hyperpage}{18}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{18}
+\indexentry{Função!\emph  {map}|hyperpage}{19}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{19}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{19}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{19}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{19}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{19}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{19}
+\indexentry{Função!\emph  {map}|hyperpage}{20}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{20}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{20}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{20}

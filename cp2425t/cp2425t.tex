@@ -991,24 +991,30 @@ O seu tipo, neste contexto, é definido como: \ensuremath{\Varid{a}\mathbin{::}[
 
 \subsection*{Problema 3}
 
-A função \ensuremath{\Varid{convolve}} foi implementada como um anamorfismo de listas (\ensuremath{\Conid{List}}), já que a função é responsável por criar a lista resultante da convolução de 2 listas fornecidas, \ensuremath{\Varid{l1}} e \ensuremath{l_2 }.
-Esta vai construindo recursivamente a lista resultado recorrendo à função \ensuremath{\anaList{\cdot }}, aplicando sucessivamente  às duas listas o gene \ensuremath{\Varid{g}} que, neste caso, está realmente construído na função \ensuremath{\Varid{anaGene}}.
+A proposta da função \ensuremath{\Varid{convolve}} fornecida no enunciado está incorreta, porque utiliza uma abordagem errada ao calcular as janelas deslizantes.
+A convolução, por definição, deve gerar uma lista de comprimento \ensuremath{\Conid{M}\mathbin{+}\Conid{N}\mathbin{-}\mathrm{1}}, sendo \ensuremath{\Conid{M}} e \ensuremath{\Conid{N}} os comprimentos das listas, o que não acontece na versão incorreta fornecida.
 
-A função \ensuremath{\Varid{anaGene}} começa por verificar se o índice \ensuremath{\Varid{i}} (inicialmente 0) ainda se encontra dentro dos limites da convolução, isto é, se \ensuremath{\Varid{i}\geq \Varid{m}\mathbin{+}\Varid{n}\mathbin{-}\mathrm{1}}. Se isto se verificar, será retornada uma lista vazia, visto que a convolução terminou, não sendo adicionado nenhum valor novo à lista final.
-Caso contrário, será calculado o elemento seguinte da lista resultado, realizando efetivamente o próximo passo da convolução: \ensuremath{\Varid{sum}\mathbin{\$}\Varid{zipWith}\;(\mathbin{*})\;\Varid{l1}\;(\map \;(\lambda \Varid{j}\to \Varid{access}\;(l_2 ,(\Varid{i},\Varid{j})))\;[\mskip1.5mu \mathrm{0}\mathinner{\ldotp\ldotp}(\Varid{m}\mathbin{-}\mathrm{1})\mskip1.5mu])}
+Por outro lado, a solução proposta resolve os problemas encontramos na função fornecida, com base num anamorfismo de listas (\ensuremath{\anaList{\Varid{g}}}) e com base matemática.
 
-Além disso, neste cálculo, é verificado se o índice \ensuremath{\Varid{i}\mathbin{-}\Varid{j}} de \ensuremath{l_2 } é válido, através da função \ensuremath{\Varid{access}}, onde duas condições são confirmadas: \ensuremath{\Varid{i}\mathbin{-}\Varid{j}} tem de ser não negativo (\ensuremath{\uncurry{(\mathbin{>})}\comp (\underline{\mathrm{0}}\times\uncurry{(\mathbin{-})})}) e menor que o comprimento de \ensuremath{l_2 } (\ensuremath{\uncurry{(\leq )}\comp (\length \times\uncurry{(\mathbin{-})})}).
+\textbf{1. Anamorfismo}
+
+A função \ensuremath{\Varid{convolve}} utiliza o anamorfismo de listas para gerar a lista de valores resultante da convolução de duas listas e
+o seu gene \ensuremath{\Varid{convolveGene}} especifica como é que cada elemento \ensuremath{\Varid{y}\;[\mskip1.5mu \Varid{i}\mskip1.5mu]} da saída é calculado, seja \ensuremath{\Varid{y}} a lista resultante da convolução.
+
+As listas são argumentos externos no gene, pois o gene é responsável apenas por definir a lógica local de como produzir cada 
+elemento da lista e determinar quando parar. No entanto, as listas, em si, são dados necessários para calcular cada posição 
+do resultado. Assim, começamos a função convolve a partir do índice 0.
 
 A função \ensuremath{\Varid{convolve}} é representada pelo seguinte diagrama:
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
-    \ensuremath{\mathbb{Z}}^* \times \ensuremath{\mathbb{Z}}^*
-           \ar[d]_-{\ensuremath{\anaList{\Varid{g}}}}
-            \ar[r]^-{\ensuremath{\Varid{g}}} 
+    \ensuremath{\mathbb{Z}}
+           \ar[d]_-{\ensuremath{\Varid{convolve}\;\Varid{l1}\;l_2 \mathrel{=}\ana{\Varid{gene}\;\Varid{l1}\;l_2 }}}
+            \ar[r]^-{\ensuremath{\Varid{gene}\;\Varid{l1}\;l_2 }} 
 &
-    \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times (\ensuremath{\mathbb{Z}}^* \times \ensuremath{\mathbb{Z}}^*)
-           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
+    \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\Varid{convolve}\;\Varid{l1}\;l_2 })}
 \\
      \ensuremath{\mathbb{Z}}^*
             \ar@/_/[r]_-{\ensuremath{\Varid{out}}_\ensuremath{\Conid{List}}} 
@@ -1018,7 +1024,29 @@ A função \ensuremath{\Varid{convolve}} é representada pelo seguinte diagrama:
 }
 \end{eqnarray*}
 
-A implementação da função \ensuremath{\Varid{convolve}} realizada foi a seguinte:
+\textbf{2. Gene}
+
+O gene \ensuremath{\Varid{convolveGene}} define a lógica para calcular cada elemento \ensuremath{\Varid{y}\;[\mskip1.5mu \Varid{i}\mskip1.5mu]} com base na definição de convolução:
+
+1. Condição de paragem:
+\begin{itemize}
+\item A convolução produz uma lista de comprimento \ensuremath{\Conid{M}\mathbin{+}\Conid{N}\mathbin{-}\mathrm{1}}, onde \ensuremath{\Conid{M}\mathrel{=}\length \;\Varid{l1}} e \ensuremath{\Conid{N}\mathrel{=}\length \;l_2 }.
+\item Quando \ensuremath{\Varid{i}\geq \Conid{M}\mathbin{+}\Conid{N}\mathbin{-}\mathrm{1}}, a convolução termina com \ensuremath{i_1\;()}.
+\end{itemize}
+
+2. Cálculo de cada elemento:
+\begin{itemize}
+\item Para cada \ensuremath{\Varid{i}}, calculámos \ensuremath{\Varid{y}\;[\mskip1.5mu \Varid{i}\mskip1.5mu]} da seguinte forma:
+\[
+y[i] = \sum_{j=0}^{M-1} l_1[j] \cdot l_2[i-j]
+\]
+\item A expressão \ensuremath{\Varid{zipWith}\;(\mathbin{*})\;\Varid{l1}\;(\map \;(\lambda \Varid{j}\to \Varid{acess}\;(l_2 ,(\Varid{i},\Varid{j})))\;[\mskip1.5mu \mathrm{0}\mathinner{\ldotp\ldotp}(\Varid{m}\mathbin{-}\mathrm{1})\mskip1.5mu])} realiza o produto entre os elementos correspondentes de \ensuremath{\Varid{l1}} e \ensuremath{l_2 \;[\mskip1.5mu \Varid{i}\mathbin{-}\Varid{j}\mskip1.5mu]}.
+\item A função \ensuremath{\Varid{acess}} verifica se o índice \ensuremath{\Varid{i}\mathbin{-}\Varid{j}} de \ensuremath{l_2 } é válido, onde duas condições são confirmadas: \ensuremath{\Varid{i}\mathbin{-}\Varid{j}} tem de ser 
+não negativo (\ensuremath{\uncurry{(\mathbin{>})}\comp (\underline{\mathrm{0}}\times\uncurry{(\mathbin{-})})}) e menor que o comprimento de \ensuremath{l_2 } (\ensuremath{\uncurry{(\leq )}\comp (\length \times\uncurry{(\mathbin{-})})}).
+Caso uma destas condições seja verdadeira, a função \ensuremath{\Varid{acess}} retorna 0, caso contrário, retorna o valor de \ensuremath{l_2 } com aquele índice.
+\end{itemize}
+
+A implementação da função \ensuremath{\Varid{convolve}} realizada é a seguinte:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1029,11 +1057,11 @@ A implementação da função \ensuremath{\Varid{convolve}} realizada foi a segu
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{convolve}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\Varid{convolve}\;\Varid{l1}\;l_2 \mathrel{=}\anaList{\Varid{anaGene}\;\Varid{l1}\;l_2 }\;\mathrm{0}{}\<[E]%
+\>[B]{}\Varid{convolve}\;\Varid{l1}\;l_2 \mathrel{=}\anaList{\Varid{convolveGene}\;\Varid{l1}\;l_2 }\;\mathrm{0}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{anaGene}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Int}\to ()+(\Varid{a},\Conid{Int}){}\<[E]%
+\>[B]{}\Varid{convolveGene}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Int}\to ()+(\Varid{a},\Conid{Int}){}\<[E]%
 \\
-\>[B]{}\Varid{anaGene}\;\Varid{l1}\;l_2 \mathrel{=}\Varid{cond}\;(\geq \Varid{m}\mathbin{+}\Varid{n}\mathbin{-}\mathrm{1})\;(\underline{\cdot }\mathbin{\$}i_1\;())\;{}\<[E]%
+\>[B]{}\Varid{convolveGene}\;\Varid{l1}\;l_2 \mathrel{=}\Varid{cond}\;(\geq \Varid{m}\mathbin{+}\Varid{n}\mathbin{-}\mathrm{1})\;(\underline{\cdot }\mathbin{\$}i_1\;()){}\<[E]%
 \\
 \>[B]{}\hsindent{21}{}\<[21]%
 \>[21]{}(\lambda \Varid{i}\to i_2\;(\Varid{sum}{}\<[37]%
@@ -1056,9 +1084,49 @@ A implementação da função \ensuremath{\Varid{convolve}} realizada foi a segu
 \ColumnHook
 \end{hscode}\resethooks
 
+Outra abordagem para a implementação da convolução de listas está representada pela função com \ensuremath{\Varid{convolve2}}. Esta abordagem
+utiliza tem como ideia base adicionar zeros ao início da lista \ensuremath{l_2 } antes de iniciar o processo de determinar os elementos da convolução.
+A função auxiliar \ensuremath{\Varid{addzeros}} realiza essa operação, ajusta o comprimento de \ensuremath{l_2 } para permitir que o cálculo da 
+convolução seja realizado com todas as posições válidas. 
+O anamorfismo, então, processa a lista ajustada para calcular os valores da convolução sequencialmente.
+
+Embora a função \ensuremath{\Varid{convolve2}} funcione corretamente e forneça os resultados corretos, optamos pela implementação baseada em \ensuremath{\Varid{convolve}}
+por alguns motivos. Primeiro, \ensuremath{\Varid{convolve}} não exige a manipulação inicial da lista de entrada, como a adição de zeros.
+Isso torna a solução mais compacta e elimina a necessidade de operações adicionais antes do início do cálculo dos elementos. 
+Além disso, a implementação da \ensuremath{\Varid{convolve}} reflete de forma mais direta a definição matemática da convolução, integrando 
+todo o processo no seu gene.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{convolve2}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{convolve2}\;\Varid{l1}\;l_2 \mathrel{=}\anaList{\Varid{anaGene2}\;\Varid{l1}}\;(\Varid{addzeros}\;l_2 ){}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mathbf{where}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\Varid{addzeros}\;\Varid{l}\mathrel{=}\Varid{replicate}\;(\length \;\Varid{l1}\mathbin{-}\mathrm{1})\;\mathrm{0}\mathbin{+\!\!+}l_2 {}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{anaGene2}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to ()+(\Varid{a},[\mskip1.5mu \Varid{a}\mskip1.5mu]){}\<[E]%
+\\
+\>[B]{}\Varid{anaGene2}\;\Varid{l1}\;l_2 {}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mid \Varid{null}\;l_2 \mathrel{=}i_1\;(){}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mid \Varid{otherwise}\mathrel{=}i_2\;(\Varid{sum}\;(\Varid{zipWith}\;(\mathbin{*})\;(\Varid{reverse}\;\Varid{l1})\;(\Varid{take}\;(\length \;\Varid{l1})\;l_2 )),\Varid{tail}\;l_2 ){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
 \subsection*{Problema 4}
 
-1. Nesta pergunta, pretende-se definir por completo, a biblioteca \ensuremath{\Conid{Expr}}, à semelhança das outras bibliotecas de estruturas fornecidas.
+1. Nesta pergunta, pretende-se definir por completo, a biblioteca \ensuremath{\Conid{Expr}}, à semelhança de outras bibliotecas de estruturas fornecidas.
 
 Definição do tipo de \ensuremath{\Conid{Expr}}:
 
@@ -1079,7 +1147,7 @@ Para o cálulo de \ensuremath{\Varid{outExpr}}, partimos da afirmação \ensurem
 \ensuremath{\begin{lcbr}\Varid{outExpr}\;(\Conid{V}\;\Varid{n})\mathrel{=}i_1\;\Varid{n}\\\Varid{outExpr}\;(\Conid{N}\;\Varid{n})\mathrel{=}(i_2\comp i_1)\;\Varid{n}\\\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{exprs})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{exprs})\end{lcbr}}
 \end{eqnarray*}
 
-Ficando assim, em Haskell, com:
+Em Haskell, temos a função \ensuremath{\Varid{outExpr}} definida da seguinte forma:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1097,7 +1165,6 @@ Ficando assim, em Haskell, com:
 Cálculo do functor de \ensuremath{\Conid{Expr}}:
 
 Sabendo que \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\Varid{f})}, temos que:
-
 \begin{eqnarray*}
 \start
 \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\Varid{id},\Varid{f})}
@@ -1119,12 +1186,12 @@ Definindo, então, \ensuremath{\Varid{recExpr}} como:
 Definição da triologia ana-cata-hylo:
 
 Começando pelo catamorfismo de \ensuremath{\Conid{Expr}}, temos:
-
 \begin{eqnarray*}
 \start
-\just\equiv{ cancelamento-cata }
+\ensuremath{\llparenthesis\, \Varid{g}\,\rrparenthesis\mathrel{=}\llparenthesis\, \Varid{g}\,\rrparenthesis}
+\just\equiv{ universal-cata }
 \ensuremath{\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \mathsf{in}\mathrel{=}\Varid{g}\comp \fun F \;\llparenthesis\, \Varid{g}\,\rrparenthesis}
-\just\equiv{ shunt-left }
+\just\equiv{ shunt-left, isomorfismo in/out }
 \ensuremath{\llparenthesis\, \Varid{g}\,\rrparenthesis\mathrel{=}\Varid{g}\comp \fun F \;\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \mathsf{out}}
 \end{eqnarray*}
 
@@ -1157,12 +1224,12 @@ Utilizando as funções previamente definidas, temos então:
 \end{hscode}\resethooks
 
 Para o anamorfismo de \ensuremath{\Conid{Expr}}, temos:
-
 \begin{eqnarray*}
 \start
-\just\equiv{ cancelamento-ana }
+\ensuremath{\ana{\Varid{g}}\mathrel{=}\ana{\Varid{g}}}
+\just\equiv{ universal-ana }
 \ensuremath{\mathsf{out}\comp \ana{\Varid{g}}\mathrel{=}\fun F \;\ana{\Varid{g}}\comp \Varid{g}}
-\just\equiv{ shunt-right }
+\just\equiv{ shunt-right, isomorfismo in/out }
 \ensuremath{\ana{\Varid{g}}\mathrel{=}\mathsf{in}\comp \fun F \;\ana{\Varid{g}}\comp \Varid{g}}
 \end{eqnarray*}
 
@@ -1259,7 +1326,7 @@ A composição com a função \ensuremath{\Varid{inExpr}} e a base do catamorfis
 De seguida, definimos a instância \ensuremath{\Conid{Applicative}}, onde a função \ensuremath{\Varid{pure}} cria uma expressão com uma variável (\ensuremath{\Conid{V}}) com o valor fornecido,
 a função \ensuremath{\mathbin{<*>}} considera três casos:
 \begin{itemize}
-\item se a expressão é uma variável (\ensuremath{\Conid{V}\;\Varid{f}}), aplica \ensuremath{\mathsf{fmap}} para mapear função sobre a outra expressão;
+\item se a expressão é uma variável (\ensuremath{\Conid{V}\;\Varid{f}}), aplica o \ensuremath{\mathsf{fmap}} para mapear função sobre a outra expressão;
 \item se a expressão é um número (\ensuremath{\Conid{N}\;\Varid{b}}), mantém o número inalterado;
 \item se a expressão é uma operação (\ensuremath{\Conid{T}\;\Varid{op}\;\Varid{fs}}), aplica a função a cada subexpressão da operação.
 \end{itemize}
@@ -1287,7 +1354,7 @@ a função \ensuremath{\mathbin{<*>}} considera três casos:
 \ColumnHook
 \end{hscode}\resethooks
 
-Por fim, a instância \ensuremath{\Conid{Monad}} foi definida, a definição \ensuremath{\Varid{return}} é equivalente a \ensuremath{\Varid{pure}}, cria uma variável.
+Por fim, a instância \ensuremath{\Conid{Monad}} foi definida, a definição \ensuremath{\Varid{return}} é equivalente a \ensuremath{\Varid{pure}} (= \ensuremath{\Conid{V}} = u), cria uma variável.
 A operação \ensuremath{\bind } aplica a função \ensuremath{\Varid{g}} a cada variável da expressão, usando a função auxiliar \ensuremath{\Varid{muExpr}} para processar a expressão resultante.
 
 \begin{hscode}\SaveRestoreHook
@@ -1323,11 +1390,26 @@ A operação \ensuremath{\bind } aplica a função \ensuremath{\Varid{g}} a cada
 \ColumnHook
 \end{hscode}\resethooks
 
-Provemos que \ensuremath{\Conid{Expr}\;\Varid{b}} é uma instância de \ensuremath{\Conid{Monad}}:
+Assim, temos:
 \begin{itemize}
 \item \ensuremath{\Varid{u}\mathrel{=}\Conid{V}} e \ensuremath{\Conid{V}\mathrel{=}\Varid{inExpr}\comp i_1}, logo \ensuremath{\Varid{u}\mathrel{=}\Varid{inExpr}\comp i_1};
 \item \ensuremath{\Varid{muExpr}\mathrel{=}\Varid{cataExpr}\;\alt{\Varid{id}}{\Varid{inExpr}\comp i_2}}.
 \end{itemize}
+
+Logo, 
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{A}}
+           \ar[r]^-{\ensuremath{\Varid{u}}}
+&
+    \ensuremath{\Conid{Expr}\;\Conid{B}\;\Conid{A}}
+&
+    \ensuremath{\Conid{Expr}\;\Conid{B}\;(\Conid{Expr}\;\Conid{B}\;\Conid{A})}
+            \ar[l]^-{\ensuremath{\Varid{mu}}}
+}
+\end{eqnarray*}
+
+Provemos que \ensuremath{\Conid{Expr}\;\Varid{b}} é uma instância de \ensuremath{\Conid{Monad}}:
 
 Provar a lei monádica Unidade (63):
 \begin{eqnarray*}
@@ -1379,7 +1461,7 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
-3. \emph{Catamorifsmo monádico}
+3. \emph{Catamorfismo monádico}
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1395,15 +1477,17 @@ Provar a lei monádica Multiplicação (62):
            \ar[d]_-{\ensuremath{\Varid{u}}}
 &
     \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
-           \ar[l]^-{\ensuremath{\Varid{g}}}
+           \ar[l]^-{\ensuremath{\Varid{g}\mathrel{=}[\mskip1.5mu \Varid{g1},\Varid{g2}\mskip1.5mu]}}
            \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\Varid{u}))}}
 \\
     \ensuremath{\Varid{m}\;(\Conid{Expr}\;\Conid{C}\;\Conid{B})}
 &
     \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Varid{m}\;(\Conid{Expr}\;\Conid{C}\;\Conid{A}))}^*))
-            \ar[l]^-{\ensuremath{\Varid{h}}}
+            \ar[l]^-{\ensuremath{\Varid{h}\mathrel{=}[\mskip1.5mu \Varid{h1},\Varid{h2}\mskip1.5mu]}}
 }
 \end{eqnarray*}
+
+Assim,
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1422,44 +1506,58 @@ Provar a lei monádica Multiplicação (62):
 }
 \end{eqnarray*}
 
-Para definir o catamorfismo monádico de \ensuremath{\Conid{Expr}}, a função \ensuremath{\Varid{mcataExpr}}, começamos por entender o papel fundamental da função \ensuremath{\Varid{dl}}, que é responsável por transformar a estrutura de \ensuremath{\Conid{Expr}} num contexto monádico. Esta transformação permite que o processamento das expressões ocorra dentro de um monad.
 
-A função \ensuremath{\Varid{dl}} é definida como:
+Para definir o catamorfismo monádico de \ensuremath{\Conid{Expr}}, a função \ensuremath{\Varid{mcataExpr}}, utilizámos o conceito de catamorfismos 
+adaptados em contextos monádicos. Isso permite que a avaliação de expressões seja realizada dentro de um \ensuremath{\Varid{monad}}, 
+o que possibilita operações com efeitos, como falhas (com \ensuremath{\Conid{Maybe}}), encadeamentos de valores (\ensuremath{\fun{IO}}) ou listas.
+
+O componente central dessa definição é a função \ensuremath{\Varid{dl'}}, esta transforma os diferentes casos da estrutura \ensuremath{\Conid{Expr}} para que os
+efeitos monádicos sejam tratados corretamente.
+
+A implementação de dl é dada por:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{dl}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{a}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]))\to \Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]))){}\<[E]%
+\>[B]{}\Varid{dl'}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{a}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]))\to \Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]))){}\<[E]%
 \\
-\>[B]{}\Varid{dl}\mathrel{=}\alt{\Varid{return}\comp i_1}{\alt{\Varid{return}\comp i_2\comp i_1}{\Varid{aux}}}{}\<[E]%
+\>[B]{}\Varid{dl'}\mathrel{=}\alt{\Varid{return}\comp i_1}{\alt{\Varid{return}\comp i_2\comp i_1}{\Varid{aux}}}{}\<[E]%
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
 \>[5]{}\mathbf{where}\;\Varid{aux}\;(\Varid{op},\Varid{ms})\mathrel{=}\mathbf{do}\;\Varid{m}\leftarrow \Varid{lamb}\;\Varid{ms};(\Varid{return}\comp i_2\comp i_2)\;(\Varid{op},\Varid{return}\;\Varid{m}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
-- No caso de um valor do tipo \ensuremath{\Varid{a}}, a função simplesmente o encapsula no monad utilizando \ensuremath{\Varid{return}\comp i_1}.
+A função \ensuremath{\Varid{dl'}} é dividida em três casos principais:
 
-- No caso de um valor do tipo \ensuremath{\Varid{b}}, o mesmo ocorre, utilizando \ensuremath{\Varid{return}\comp i_2\comp i_1}.
+- Para variáveis (\ensuremath{\Varid{a}}), a função simplesmente o encapsula no monad utilizando \ensuremath{\Varid{return}\comp i_1}.
 
-- No caso de uma operação (\ensuremath{\Conid{Op}}) acompanhada por uma lista de valores monádicos (\ensuremath{[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]}), é usada a função auxiliar \ensuremath{\Varid{aux}}.
+- Para constantes (\ensuremath{\Varid{b}}), o mesmo ocorre, utilizando \ensuremath{\Varid{return}\comp i_2\comp i_1}.
 
-Dentro de \ensuremath{\Varid{aux}}, a função \ensuremath{\Varid{lamb}} é utilizada para distribuir o monad pela lista. Em seguida, o resultado é encapsulado novamente na estrutura esperada pelo tipo \ensuremath{\Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu])))}.
+- Para operadores (\ensuremath{\Conid{Op}}) acompanhada por uma lista de valores monádicos (\ensuremath{[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]}), é usada a função auxiliar \ensuremath{\Varid{aux}}.
 
-A função \ensuremath{\Varid{mcataExpr}}, que define o catamorfismo monádico propriamente dito, é então definida da seguinte forma:
+Dentro de \ensuremath{\Varid{aux}}, a função \ensuremath{\Varid{lamb}} é utilizada para distribuir o monad pela lista de valores monádicos (\ensuremath{[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]}),
+de modo a produzir um valor monádico contendo a lista de valores já resolvidos (\ensuremath{\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]}).
+Em seguida, o resultado é encapsulado novamente na estrutura esperada pelo tipo \ensuremath{\Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu])))}.
+
+A função \ensuremath{\Varid{mcataExpr}} utiliza a função \ensuremath{\Varid{dl'}} como parte da transformação recursiva, sendo definida da seguinte forma:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{mcataExpr}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow (\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]))\to \Varid{m}\;\Varid{c})\to \Conid{Expr}\;\Varid{b}\;\Varid{a}\to \Varid{m}\;\Varid{c}{}\<[E]%
-\\
-\>[B]{}\Varid{mcataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\mathbin{.!}(\Varid{dl}\comp \Varid{recExpr}\;(\Varid{mcataExpr}\;\Varid{g})\comp \Varid{outExpr}){}\<[E]%
+\>[B]{}\Varid{mcataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\mathbin{.!}(\Varid{dl'}\comp \Varid{recExpr}\;(\Varid{mcataExpr}\;\Varid{g})\comp \Varid{outExpr}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
-Esta definição, assemelha-se à definição do catamorfismo simples, com a diferença de que a função \ensuremath{\Varid{dl}} é usada para distribuir o monad sobre a lista de subexpressões.
-
+Esta definição, assemelha-se à definição do catamorfismo simples, com a diferença de que a função \ensuremath{\Varid{dl}} é usada para distribuir o monad sobre a lista de subexpressões:
+\begin{itemize}
+\item A estrutura de entrada (\ensuremath{\Conid{Expr}}) é decomposta usando a função \ensuremath{\Varid{outExpr}};
+\item A função \ensuremath{\Varid{recExpr}} aplica recursivamente o catamorfismo monádico a todas as subexpressões da estrutura;
+\item A função \ensuremath{\Varid{dl'}} reorganiza os valores monádicos produzidos pela decomposição das subexpressões, sendo responsável por lidar com os efeitos monádicos corretamente;
+\item Por fim, a álgebra monádica \ensuremath{\Varid{g}} é aplicada para produzir o valor final no contexto monádico.
+\end{itemize}
+\paragraph{}
 4.
 \emph{Maps}:
 \emph{Monad}:
@@ -1503,24 +1601,8 @@ Segue a implementação da função \ensuremath{\Varid{let\char95 exp}}:
 \ColumnHook
 \end{hscode}\resethooks
 
-Catamorfismo monádico:
-\begin{hscode}\SaveRestoreHook
-\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{mcataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\mathbin{.!}(\Varid{dl'}\comp \Varid{recExpr}\;(\Varid{mcataExpr}\;\Varid{g})\comp \Varid{outExpr}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{dl'}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{a}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]))\to \Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]))){}\<[E]%
-\\
-\>[B]{}\Varid{dl'}\mathrel{=}\alt{\Varid{return}\comp i_1}{\alt{\Varid{return}\comp i_2\comp i_1}{\Varid{aux}}}{}\<[E]%
-\\
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\mathbf{where}\;\Varid{aux}\;(\Varid{op},\Varid{ms})\mathrel{=}\mathbf{do}\;\Varid{m}\leftarrow \Varid{lamb}\;\Varid{ms};(\Varid{return}\comp i_2\comp i_2)\;(\Varid{op},\Varid{return}\;\Varid{m}){}\<[E]%
-\ColumnHook
-\end{hscode}\resethooks
 
-
-Avaliação de expressões:
+5. Avaliação de expressões:
 
 A função \ensuremath{\Varid{evaluate}} avalia expressões do tipo \ensuremath{\Conid{Expr}} e retorna o resultado da avaliação com o tipo \ensuremath{\Conid{Maybe}}.
 Esta função tem em conta dois cenários de erro: variáveis não instanciadas e operadores aplicados a um número incorreto de argumentos.
@@ -1528,6 +1610,24 @@ Esta função tem em conta dois cenários de erro: variáveis não instanciadas 
 A função \ensuremath{\Varid{evaluate}} utiliza o catamorfismo \ensuremath{\Varid{mcataExpr}} para avaliar a expressão. Este conceito generaliza o conceito de catamorfismo simples para permitir trabalhar em contextos monádicos.
 O ponto central deste conceito é que combina a lógica de transformação (\ensuremath{\Varid{g}}) com a recursão da estrutura, enquanto lida automaticamente com contextos monádicos. Assim, evitámos
 tratar manualmente de cada contexto monádico \ensuremath{\Conid{Maybe}} em cada passo.
+
+A função \ensuremath{\Varid{evaluate}} pode ser representada pelo seguinte diagrama:
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\Varid{evaluate}}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;(\Varid{evaluate})))}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathbf{in}}}
+\\
+    \ensuremath{\Conid{Maybe}\;\Conid{A}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Maybe}\;\Conid{A})}^*))
+            \ar[l]^-{\ensuremath{[\mskip1.5mu \underline{\Conid{Nothing}},\alt{\Conid{Just}}{\Varid{aux}}\mskip1.5mu]}}
+}
+\end{eqnarray*}
 
 No caso do \ensuremath{\Varid{evaluate}}, o gene \ensuremath{\Varid{gene}} define como é que se processa cada nodo da estrutura \ensuremath{\Conid{Expr}}.
 O gene \ensuremath{\Varid{gene}} lida com três casos principais:

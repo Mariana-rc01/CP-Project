@@ -181,6 +181,7 @@ import Data.Ratio
 import Control.Concurrent
 import Data.List (find)
 import BTree (hyloBTree, qsep)
+import Text.XHtml (paragraph)
 
 main = undefined
 \end{code}
@@ -774,24 +775,30 @@ O seu tipo, neste contexto, é definido como: | a :: [Either Integer (Integer, [
 
 \subsection*{Problema 3}
 
-A função |convolve| foi implementada como um anamorfismo de listas (|List|), já que a função é responsável por criar a lista resultante da convolução de 2 listas fornecidas, |l1| e |l2|.
-Esta vai construindo recursivamente a lista resultado recorrendo à função |anaList|, aplicando sucessivamente  às duas listas o gene |g| que, neste caso, está realmente construído na função |anaGene|.
+A proposta da função |convolve| fornecida no enunciado está incorreta, porque utiliza uma abordagem errada ao calcular as janelas deslizantes.
+A convolução, por definição, deve gerar uma lista de comprimento |M + N - 1|, sendo |M| e |N| os comprimentos das listas, o que não acontece na versão incorreta fornecida.
 
-A função |anaGene| começa por verificar se o índice |i| (inicialmente 0) ainda se encontra dentro dos limites da convolução, isto é, se |i >= m + n - 1|. Se isto se verificar, será retornada uma lista vazia, visto que a convolução terminou, não sendo adicionado nenhum valor novo à lista final.
-Caso contrário, será calculado o elemento seguinte da lista resultado, realizando efetivamente o próximo passo da convolução: |sum $ zipWith (*) l1 (map (\j -> access (l2, (i, j))) [0..(m - 1)])|
+Por outro lado, a solução proposta resolve os problemas encontramos na função fornecida, com base num anamorfismo de listas (|anaList g|) e com base matemática.
 
-Além disso, neste cálculo, é verificado se o índice |i-j| de |l2| é válido, através da função |access|, onde duas condições são confirmadas: |i-j| tem de ser não negativo (|uncurry (>).(const 0 >< uncurry (-))|) e menor que o comprimento de |l2| (|uncurry (<=).(length >< uncurry (-))|).
+\textbf{1. Anamorfismo}
+
+A função |convolve| utiliza o anamorfismo de listas para gerar a lista de valores resultante da convolução de duas listas e
+o seu gene |convolveGene| especifica como é que cada elemento |y[i]| da saída é calculado, seja |y| a lista resultante da convolução.
+
+As listas são argumentos externos no gene, pois o gene é responsável apenas por definir a lógica local de como produzir cada 
+elemento da lista e determinar quando parar. No entanto, as listas, em si, são dados necessários para calcular cada posição 
+do resultado. Assim, começamos a função convolve a partir do índice 0.
 
 A função |convolve| é representada pelo seguinte diagrama:
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
-    |Integer|^* \times |Integer|^*
-           \ar[d]_-{|anaList g|}
-            \ar[r]^-{|g|} 
+    |Integer|
+           \ar[d]_-{|convolve l1 l2 = ana (gene l1 l2)|}
+            \ar[r]^-{|gene l1 l2|} 
 &
-    |1 + Integer| \times (|Integer|^* \times |Integer|^*)
-           \ar[d]^{|id + (id| \times |anaList g|)}
+    |1 + Integer| \times |Integer|
+           \ar[d]^{|id + (id| \times |convolve l1 l2|)}
 \\
      |Integer|^*
             \ar@@/_/[r]_-{|out|_|List|} 
@@ -801,14 +808,36 @@ A função |convolve| é representada pelo seguinte diagrama:
 }
 \end{eqnarray*}
 
-A implementação da função |convolve| realizada foi a seguinte:
+\textbf{2. Gene}
+
+O gene |convolveGene| define a lógica para calcular cada elemento |y[i]| com base na definição de convolução:
+
+1. Condição de paragem:
+\begin{itemize}
+\item A convolução produz uma lista de comprimento |M + N - 1|, onde |M = length l1| e |N = length l2|.
+\item Quando |i >= M + N - 1|, a convolução termina com |i1()|.
+\end{itemize}
+
+2. Cálculo de cada elemento:
+\begin{itemize}
+\item Para cada |i|, calculámos |y[i]| da seguinte forma:
+\[
+y[i] = \sum_{j=0}^{M-1} l_1[j] \cdot l_2[i-j]
+\]
+\item A expressão |zipWith (*) l1 (map (\j -> acess (l2,(i,j))) [0..(m-1)])| realiza o produto entre os elementos correspondentes de |l1| e |l2[i-j]|.
+\item A função |acess| verifica se o índice |i-j| de |l2| é válido, onde duas condições são confirmadas: |i-j| tem de ser 
+não negativo (|uncurry (>).(const 0 >< uncurry (-))|) e menor que o comprimento de |l2| (|uncurry (<=).(length >< uncurry (-))|).
+Caso uma destas condições seja verdadeira, a função |acess| retorna 0, caso contrário, retorna o valor de |l2| com aquele índice.
+\end{itemize}
+
+A implementação da função |convolve| realizada é a seguinte:
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
-convolve l1 l2 = anaList (anaGene l1 l2) 0
+convolve l1 l2 = anaList (convolveGene l1 l2) 0
 
-anaGene :: Num a => [a] -> [a] -> Int -> Either () (a, Int)
-anaGene l1 l2 = cond (>= m + n - 1) (const $ i1 ())
+convolveGene :: Num a => [a] -> [a] -> Int -> Either () (a, Int)
+convolveGene l1 l2 = cond (>= m + n - 1) (const $ i1 ())
                     (\i -> i2 (sum  $ zipWith (*) l1 (map (\j -> access (l2, (i, j))) [0..(m - 1)]), i + 1))
     where
         m = length l1; n = length l2
@@ -818,9 +847,36 @@ anaGene l1 l2 = cond (>= m + n - 1) (const $ i1 ())
 
 \end{code}
 
+Outra abordagem para a implementação da convolução de listas está representada pela função com |convolve2|. Esta abordagem
+utiliza tem como ideia base adicionar zeros ao início da lista |l2| antes de iniciar o processo de determinar os elementos da convolução.
+A função auxiliar |addzeros| realiza essa operação, ajusta o comprimento de |l2| para permitir que o cálculo da 
+convolução seja realizado com todas as posições válidas. 
+O anamorfismo, então, processa a lista ajustada para calcular os valores da convolução sequencialmente.
+
+Embora a função |convolve2| funcione corretamente e forneça os resultados corretos, optamos pela implementação baseada em |convolve|
+por alguns motivos. Primeiro, |convolve| não exige a manipulação inicial da lista de entrada, como a adição de zeros.
+Isso torna a solução mais compacta e elimina a necessidade de operações adicionais antes do início do cálculo dos elementos. 
+Além disso, a implementação da |convolve| reflete de forma mais direta a definição matemática da convolução, integrando 
+todo o processo no seu gene.
+
+\begin{code}
+
+convolve2 :: Num a => [a] -> [a] -> [a]
+convolve2 l1 l2 = anaList (anaGene2 l1) (addzeros l2)
+    where
+      addzeros l = replicate (length l1 - 1) 0 ++ l2
+
+anaGene2 :: Num a => [a] -> [a] -> Either () (a, [a])
+anaGene2 l1 l2
+    | null l2 = i1 ()
+    | otherwise = i2 (sum (zipWith (*) (reverse l1) (take (length l1) l2)), tail l2)
+
+\end{code}
+
+
 \subsection*{Problema 4}
 
-1. Nesta pergunta, pretende-se definir por completo, a biblioteca |Expr|, à semelhança das outras bibliotecas de estruturas fornecidas.
+1. Nesta pergunta, pretende-se definir por completo, a biblioteca |Expr|, à semelhança de outras bibliotecas de estruturas fornecidas.
 
 Definição do tipo de |Expr|:
 
@@ -869,7 +925,7 @@ Para o cálulo de |outExpr|, partimos da afirmação |outExpr . inExpr = id|,
 |
 \end{eqnarray*}
 
-Ficando assim, em Haskell, com:
+Em Haskell, temos a função |outExpr| definida da seguinte forma:
 
 \begin{code}
 
@@ -883,7 +939,6 @@ outExpr (T op exprs) = (i2.i2) (op,exprs)
 Cálculo do functor de |Expr|:
 
 Sabendo que |F f = B(id, f)|, temos que:
-
 \begin{eqnarray*}
 \start
 |
@@ -907,14 +962,16 @@ recExpr = baseExpr id id
 Definição da triologia ana-cata-hylo:
 
 Começando pelo catamorfismo de |Expr|, temos:
-
 \begin{eqnarray*}
 \start
-\just\equiv{ cancelamento-cata }
+|
+   cata g = cata g 
+|
+\just\equiv{ universal-cata }
 |
     cata g . inT = g . fF (cata g)
 |
-\just\equiv{ shunt-left }
+\just\equiv{ shunt-left, isomorfismo in/out }
 |
     cata g = g . fF (cata g) . outT
 |
@@ -948,14 +1005,16 @@ cataExpr g = g . recExpr (cataExpr g) . outExpr
 \end{code}
 
 Para o anamorfismo de |Expr|, temos:
-
 \begin{eqnarray*}
 \start
-\just\equiv{ cancelamento-ana }
+|
+    ana g = ana g
+|
+\just\equiv{ universal-ana }
 |
     outT . ana g = fF (ana g) . g
 |
-\just\equiv{ shunt-right }
+\just\equiv{ shunt-right, isomorfismo in/out }
 |
     ana g = inT . fF (ana g) . g
 |
@@ -1050,7 +1109,7 @@ instance Functor (Expr b)
 De seguida, definimos a instância |Applicative|, onde a função |pure| cria uma expressão com uma variável (|V|) com o valor fornecido,
 a função |<*>| considera três casos:
 \begin{itemize}
-\item se a expressão é uma variável (|V f|), aplica |fmap| para mapear função sobre a outra expressão;
+\item se a expressão é uma variável (|V f|), aplica o |fmap| para mapear função sobre a outra expressão;
 \item se a expressão é um número (|N b|), mantém o número inalterado;
 \item se a expressão é uma operação (|T op fs|), aplica a função a cada subexpressão da operação.
 \end{itemize}
@@ -1066,7 +1125,7 @@ instance Applicative (Expr b) where
 
 \end{code}
 
-Por fim, a instância |Monad| foi definida, a definição |return| é equivalente a |pure|, cria uma variável.
+Por fim, a instância |Monad| foi definida, a definição |return| é equivalente a |pure| (= |V| = u), cria uma variável.
 A operação |>>=| aplica a função |g| a cada variável da expressão, usando a função auxiliar |muExpr| para processar a expressão resultante.
 
 \begin{code}
@@ -1086,11 +1145,26 @@ u = V
 
 \end{code}
 
-Provemos que |Expr b| é uma instância de |Monad|:
+Assim, temos:
 \begin{itemize}
 \item |u = V| e |V = inExpr . i1|, logo |u = inExpr . i1|;
 \item |muExpr = cataExpr (either id (inExpr . i2))|.
 \end{itemize}
+
+Logo, 
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |A|
+           \ar[r]^-{| u |}
+&
+    |Expr B A|
+&
+    |Expr B (Expr B A)|
+            \ar[l]^-{|mu|}
+}
+\end{eqnarray*}
+
+Provemos que |Expr b| é uma instância de |Monad|:
 
 Provar a lei monádica Unidade (63):
 \begin{eqnarray*}
@@ -1186,7 +1260,7 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
-3. \emph{Catamorifsmo monádico}
+3. \emph{Catamorfismo monádico}
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -1202,15 +1276,17 @@ Provar a lei monádica Multiplicação (62):
            \ar[d]_-{|u|}
 &
     |A + (C + (Op >< (Expr C B)|^*))
-           \ar[l]^-{|g|}
+           \ar[l]^-{|g = [g1,g2]|}
            \ar[d]^{|id + (id + (id >< map u))|}
 \\
     |m (Expr C B)|
 &
     |A + (C + (Op >< (m (Expr C A))|^*))
-            \ar[l]^-{|h|}
+            \ar[l]^-{|h = [h1,h2]|}
 }
 \end{eqnarray*}
+
+Assim,
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -1229,37 +1305,52 @@ Provar a lei monádica Multiplicação (62):
 }
 \end{eqnarray*}
 
-Para definir o catamorfismo monádico de |Expr|, a função |mcataExpr|, começamos por entender o papel fundamental da função |dl|, que é responsável por transformar a estrutura de |Expr| num contexto monádico. Esta transformação permite que o processamento das expressões ocorra dentro de um monad.
 
-A função |dl| é definida como:
+Para definir o catamorfismo monádico de |Expr|, a função |mcataExpr|, utilizámos o conceito de catamorfismos 
+adaptados em contextos monádicos. Isso permite que a avaliação de expressões seja realizada dentro de um |monad|, 
+o que possibilita operações com efeitos, como falhas (com |Maybe|), encadeamentos de valores (|IO|) ou listas.
+
+O componente central dessa definição é a função |dl'|, esta transforma os diferentes casos da estrutura |Expr| para que os
+efeitos monádicos sejam tratados corretamente.
+
+A implementação de dl é dada por:
 
 \begin{code}
 
-dl :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
-dl = either (return . i1) (either (return . i2 . i1) aux)
+dl' :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
+dl' = either (return . i1) (either (return . i2 . i1) aux)
     where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
 
 \end{code}
 
-- No caso de um valor do tipo |a|, a função simplesmente o encapsula no monad utilizando |return . i1|.
+A função |dl'| é dividida em três casos principais:
 
-- No caso de um valor do tipo |b|, o mesmo ocorre, utilizando |return . i2 . i1|.
+- Para variáveis (|a|), a função simplesmente o encapsula no monad utilizando |return . i1|.
 
-- No caso de uma operação (|Op|) acompanhada por uma lista de valores monádicos (|[m c]|), é usada a função auxiliar |aux|.
+- Para constantes (|b|), o mesmo ocorre, utilizando |return . i2 . i1|.
 
-Dentro de |aux|, a função |lamb| é utilizada para distribuir o monad pela lista. Em seguida, o resultado é encapsulado novamente na estrutura esperada pelo tipo |m (Either a (Either b (Op, m [c])))|.
+- Para operadores (|Op|) acompanhada por uma lista de valores monádicos (|[m c]|), é usada a função auxiliar |aux|.
 
-A função |mcataExpr|, que define o catamorfismo monádico propriamente dito, é então definida da seguinte forma:
+Dentro de |aux|, a função |lamb| é utilizada para distribuir o monad pela lista de valores monádicos (|[m c]|),
+de modo a produzir um valor monádico contendo a lista de valores já resolvidos (|m [c]|).
+Em seguida, o resultado é encapsulado novamente na estrutura esperada pelo tipo |m (Either a (Either b (Op, m [c])))|.
+
+A função |mcataExpr| utiliza a função |dl'| como parte da transformação recursiva, sendo definida da seguinte forma:
 
 \begin{code}
 
-mcataExpr :: Monad m => (Either a (Either b (Op, m [c])) -> m c) -> Expr b a -> m c
-mcataExpr g = g .! (dl . recExpr (mcataExpr g) . outExpr)
+mcataExpr g = g .! (dl' . recExpr (mcataExpr g) . outExpr)
 
 \end{code}
 
-Esta definição, assemelha-se à definição do catamorfismo simples, com a diferença de que a função |dl| é usada para distribuir o monad sobre a lista de subexpressões.
-
+Esta definição, assemelha-se à definição do catamorfismo simples, com a diferença de que a função |dl| é usada para distribuir o monad sobre a lista de subexpressões:
+\begin{itemize}
+\item A estrutura de entrada (|Expr|) é decomposta usando a função |outExpr|;
+\item A função |recExpr| aplica recursivamente o catamorfismo monádico a todas as subexpressões da estrutura;
+\item A função |dl'| reorganiza os valores monádicos produzidos pela decomposição das subexpressões, sendo responsável por lidar com os efeitos monádicos corretamente;
+\item Por fim, a álgebra monádica |g| é aplicada para produzir o valor final no contexto monádico.
+\end{itemize}
+\paragraph{}
 4.
 \emph{Maps}:
 \emph{Monad}:
@@ -1300,17 +1391,8 @@ Segue a implementação da função |let_exp|:
 let_exp f = cataExpr (either f (either N (uncurry T)))
 \end{code}
 
-Catamorfismo monádico:
-\begin{code}
-mcataExpr g = g .! (dl' . recExpr (mcataExpr g) . outExpr)
 
-dl' :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
-dl' = either (return . i1) (either (return . i2 . i1) aux)
-    where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
-\end{code}
-
-
-Avaliação de expressões:
+5. Avaliação de expressões:
 
 A função |evaluate| avalia expressões do tipo |Expr| e retorna o resultado da avaliação com o tipo |Maybe|.
 Esta função tem em conta dois cenários de erro: variáveis não instanciadas e operadores aplicados a um número incorreto de argumentos.
@@ -1318,6 +1400,24 @@ Esta função tem em conta dois cenários de erro: variáveis não instanciadas 
 A função |evaluate| utiliza o catamorfismo |mcataExpr| para avaliar a expressão. Este conceito generaliza o conceito de catamorfismo simples para permitir trabalhar em contextos monádicos.
 O ponto central deste conceito é que combina a lógica de transformação (|g|) com a recursão da estrutura, enquanto lida automaticamente com contextos monádicos. Assim, evitámos
 tratar manualmente de cada contexto monádico |Maybe| em cada passo.
+
+A função |evaluate| pode ser representada pelo seguinte diagrama:
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar[d]_-{|evaluate|}
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (evaluate)))|}
+           \ar@@/^-1pc/[l]_-{|in |}
+\\
+    |Maybe A|
+&
+    |A + (C + (Op >< (Maybe A)|^*))
+            \ar[l]^-{|[const Nothing, either Just aux]|}
+}
+\end{eqnarray*}
 
 No caso do |evaluate|, o gene |gene| define como é que se processa cada nodo da estrutura |Expr|.
 O gene |gene| lida com três casos principais:
