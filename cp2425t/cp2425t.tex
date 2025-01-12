@@ -757,18 +757,82 @@ que sejam necessárias.
 
 \subsection*{Problema 1}
 
+A função \ensuremath{\Varid{hindex}} foi implementada como um hilomorfismo de \ensuremath{\Conid{BTree}} (\ensuremath{\Varid{hyloBTree}}), visto que o problema assemelha-se ao processo de ordenação \ensuremath{\Varid{qsort}},
+que também utiliza um hilomorfismo. A ideia principal foi usar a partição de elementos como o \ensuremath{\Varid{qSort}} usa e adaptar o restante processo para calcular o h-index.
+
+A função \ensuremath{\Varid{hindex}} é representada pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\mathbb{Z}}^*
+           \ar[d]_-{\ensuremath{\ana{\Varid{qsep}}}}
+           \ar[r]^-{\ensuremath{\Varid{qsep}}}
+&
+    \ensuremath{\mathrm{1}+(\mathbb{Z},(\mathbb{Z}}^*\ensuremath{,\mathbb{Z}}^*\ensuremath{))}
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times(\ana{\Varid{qsep}}\times\ana{\Varid{qsep}})}}
+\\
+    \ensuremath{\Conid{BTree}\;\mathbb{Z}}
+           \ar[d]_-{\ensuremath{\cataNat{\Varid{f}}}}
+           \ar@/_/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\mathrm{1}+(\mathbb{Z},(\Conid{BTree}\;\mathbb{Z},\Conid{BTree}\;\mathbb{Z}))}
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times(\llparenthesis\, \Varid{f}\,\rrparenthesis\times\llparenthesis\, \Varid{f}\,\rrparenthesis)}}
+           \ar@/_/[l]_-{\ensuremath{\mathbf{in}}}
+\\
+    \ensuremath{(\mathbb{Z},\mathbb{Z}}^*\ensuremath{)}
+&
+    \ensuremath{\mathrm{1}+(\mathbb{Z},((\mathbb{Z},\mathbb{Z}}^*\ensuremath{),(\mathbb{Z},\mathbb{Z}}^*\ensuremath{)))}
+           \ar[l]^-{\ensuremath{\Varid{f}\mathrel{=}\alt{\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}}{\Varid{hI}}}}
+}
+\end{eqnarray*}
+
+Esta função é composta por um anamorfismo (\ensuremath{\Varid{anaBTree}\;\Varid{qsep}}) e por um catamorfismo (\ensuremath{\Varid{cataBTree}\;\alt{\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}}{\Varid{hI}}}).
+
+\textbf{1. Anamorfismo}
+
+A função \ensuremath{\Varid{qsep}} é responsável por dividir a lista de alturas do histograma e construir recursivamente a árvore binária.
+Assim, caso a lista esteja vazia, retorna \ensuremath{i_1\;()}.
+
+Caso contrário, o primeiro elemento da lista é escolhido como pivô e os elementos restantes são divididos em dois subconjuntos: \ensuremath{\Varid{s}} contém os elementos menores que o pivô e \ensuremath{\Varid{l}} contém os elementos maiores ou iguais ao pivô.
+Esta divisão é realizada pela função \ensuremath{\Varid{part}} que percorre a lista e verifica, para cada elemento, se este satisfaz o predicado \ensuremath{\Varid{p}}, no caso da função \ensuremath{\Varid{qsep}}, se é menor que o pivô.
+
+Então, o resultado da função \ensuremath{\Varid{qsep}} é uma árvore binária onde cada nodo contém um pivô e as suas subárvores representam os valores menores e maiores, respetivamente.
+
+\textbf{2. Catamorfismo}
+
+O catamorfismo \ensuremath{\Varid{cataBTree}\;\alt{\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}}{\Varid{hI}}} verifica se o nodo é vazio e retorna \ensuremath{(\mathrm{0},[\mskip1.5mu \mskip1.5mu])}.
+Caso contrário, aplica a função \ensuremath{\Varid{hI}} que calcula o h-index e os contribuidores para o nodo atual.
+
+A função \ensuremath{\Varid{hI}} segue os seguintes passos:
+
+\textbf{2.1. Combinação dos valores das subárvores:} junta os valores das subárvores esquerda e direita numa lista, adicionando o valor do nodo atual.
+
+\textbf{2.2. Cálculo do h-index:} cada elemento da lista é emparelhado com a sua posição usando \ensuremath{\Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu]\;\Varid{list}}, a função \ensuremath{\Varid{myfoldr}} percorre esses pares para calcular o maior índice \ensuremath{\Varid{k}} tal que o valor associado seja maior ou igual a \ensuremath{\Varid{k}}.
+Ou seja, a lista \ensuremath{\Varid{list}} é transformada em pares \ensuremath{(\Varid{k},\Varid{height})}, onde \ensuremath{\Varid{k}} representa a posição e \ensuremath{\Varid{height}} é o alor da altura correspondente. A função \ensuremath{\Varid{process}} verifica:
+\begin{itemize}
+    \item Se \ensuremath{\Varid{height}\geq \Varid{k}}, então o h-index é atualizado para o máximo entre o valor atual e \ensuremath{\Varid{k}}.
+    \item Caso contrário, o h-index mantém-se inalterado.
+\end{itemize}
+A função \ensuremath{\Varid{process}}:
+\begin{itemize}
+    \item verifica se a altura é maior ou igual ao índice: \ensuremath{\uncurry{(\geq )}\comp \Varid{swap}\comp \p1};
+    \item se a condição for satisfeita, atualiza o h-index: \ensuremath{\uncurry{\Varid{max}}\comp \Varid{swap}\comp (\p1\times\Varid{id})};
+    \item caso contrário, mantém o valor atual: \ensuremath{\p2}.
+\end{itemize}
+
+\textbf{2.3. Identificação dos contribuidores:} a lista é filtrada para conter apenas os valores maiores ou iguais ao h-index (\ensuremath{\Varid{filter}\;(\geq \Varid{hIndex})\;\Varid{list}}).
+
+Segue a implementação da função \ensuremath{\Varid{hindex}}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{9}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{hindex}\mathrel{=}\Varid{hyloBTree}\;\alt{\Varid{f1}}{\Varid{f2}}\;\Varid{qsep}{}\<[E]%
+\>[B]{}\Varid{hindex}\mathrel{=}\Varid{hyloBTree}\;\alt{\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}}{\Varid{hI}}\;\Varid{qsep}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{f1}\mathrel{=}\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{f2}\mathbin{::}(\Conid{Int},((\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu]),(\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu])))\to (\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu]){}\<[E]%
+\>[B]{}\Varid{hI}\mathbin{::}(\Conid{Int},((\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu]),(\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu])))\to (\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu]){}\<[E]%
 \\
-\>[B]{}\Varid{f2}\;(\Varid{n},((\anonymous ,\Varid{ll}),(\anonymous ,\Varid{lr})))\mathrel{=}(\Varid{hIndex},\Varid{contributors}){}\<[E]%
+\>[B]{}\Varid{hI}\;(\Varid{n},((\anonymous ,\Varid{ll}),(\anonymous ,\Varid{lr})))\mathrel{=}(\Varid{hIndex},\Varid{contributors}){}\<[E]%
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
 \>[5]{}\mathbf{where}{}\<[E]%
@@ -792,23 +856,25 @@ que sejam necessárias.
 
 \subsection*{Problema 2}
 
-A função primes é responsável por criar a lista de fatores primos de um dado número. De modo que, esta função pode ser definida
+Primeira parte:
+
+A função \ensuremath{\Varid{primes}} é responsável por criar a lista de fatores primos de um dado número. De modo que, esta função pode ser definida
 como um anamorfismo de listas (\ensuremath{\Conid{List}}). Assim, o diagrama que representa a operação é o seguinte:
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
     \ensuremath{\mathbb{Z}}
            \ar[d]_-{\ensuremath{\anaList{\Varid{g}}}}
-            \ar[r]_-{\ensuremath{\Varid{g}}} 
+            \ar[r]^-{\ensuremath{\Varid{g}}} 
 &
     \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}
            \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
 \\
      \ensuremath{\mathbb{Z}}^*
-            \ar[r]_-{\ensuremath{\Varid{outList}}} 
+            \ar@/_/[r]_-{\ensuremath{\Varid{out}}_\ensuremath{\Conid{List}}} 
 &
      \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}^*
-           \ar[l]_-{\ensuremath{\Varid{inList}}}
+           \ar@/_/[l]_-{\ensuremath{\mathbf{in}}_\ensuremath{\Conid{List}}}
 }
 \end{eqnarray*}
 
@@ -857,7 +923,6 @@ pode ser decomposto de forma única como um produto de fatores primos.
 O processo descrito no gene \ensuremath{\Varid{g}} utiliza esta propriedade para decompor iterativamente o \ensuremath{\Varid{n}} nos seus fatores primos,
 onde a divisibilidade é verificada e avançamos na procura do menor fator primo.
 
-Primeira parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{38}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -875,10 +940,11 @@ Primeira parte:
 \ColumnHook
 \end{hscode}\resethooks
 
+Segunda parte:
+
 A função \ensuremath{\Varid{prime\char95 tree}} é responsável por criar a árvore dos primos de uma lista de inteiros, como se encontra ilustrado no enunciado.
 De modo que, esta função pode ser definida da seguinte forma:
 
-Segunda parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -895,16 +961,16 @@ Explicação da função \ensuremath{\Varid{prime\char95 tree}}:
 1. A função \ensuremath{\Varid{primes}} é aplicada a cada elemento da lista de inteiros e com o uso da expressão \ensuremath{\map \;(\lambda \Varid{n}\to (\Varid{primes}\;\Varid{n},\Varid{n}))}, obtemos uma lista de pares, onde o primeiro elemento é a lista de fatores primos de um número e o segundo elemento é o próprio número.
 Assim, no final da execução desta expressão, obtemos uma lista de pares do tipo \ensuremath{[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu]}.
 
-2. Neste contexto, a função \ensuremath{\Varid{untar}} converte os fatores primos de um número e o próprio número numa representação de árvore onde os nós intermediários são os fatores e as folhas são os números originais, \ensuremath{[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]}.
+2. Neste contexto, a função \ensuremath{\Varid{untar}} converte os fatores primos de um número e o próprio número numa representação de árvore onde os nodos intermediários são os fatores e as folhas são os números originais, \ensuremath{[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]}.
 Esta conversão é realizada em três partes principais: a coalgebra, a base e a álgebra.
 
 2.1. A coalgebra, representada pela função \ensuremath{\Varid{c}}, é responsável por decompor os dados, ou seja, separa os pares da lista inicial - \ensuremath{[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu]} - e transforma cada elemento para o formato \ensuremath{\mathbb{Z}+(\mathbb{Z},[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu])}.
 
-2.1.1. O \ensuremath{\map \;((\p2\mathbin{-!-}\Varid{assocr})\comp \Varid{distl}\comp (\Varid{outList}\times\Varid{id}))} é aplicado a cada par da lista, onde:
+2.1.1. O \ensuremath{\map \;((\p2\mathbin{+}\Varid{assocr})\comp \Varid{distl}\comp (\Varid{outList}\times\Varid{id}))} é aplicado a cada par da lista, onde:
     \begin{itemize}
         \item \ensuremath{\Varid{outList}\times\Varid{id}} transforma a lista de fatores primos num tipo \ensuremath{\cdot +\cdot } e retorna o número original. Permitindo tratar em separado os fatores primos e os números. 
         \item \ensuremath{\Varid{distl}} distribui os elementos \ensuremath{(\Varid{a},\Varid{b})+\cdot } para o tipo \ensuremath{(\Varid{a}+\Varid{b},\Varid{b})}, separa os dados para facilitar o processamento posterior.
-        \item \ensuremath{\p2\mathbin{-!-}\Varid{assocr}} reorganiza os pares para agrupar corretamente os fatores primos associados a um número.
+        \item \ensuremath{\p2\mathbin{+}\Varid{assocr}} reorganiza os pares para agrupar corretamente os fatores primos associados a um número.
     \end{itemize}
 
 2.1.2. \ensuremath{\Varid{sep}} percorre a lista de elementos \ensuremath{\cdot +\cdot }, e separa os elementos \ensuremath{i_1} para o primeiro grupo e os \ensuremath{i_2} para o segundo grupo.
@@ -918,7 +984,7 @@ Então, os números que partilham o mesmo fator primo são agrupados juntos.
 
 \ensuremath{\Varid{base}\mathbin{::}(\mathbb{Z}\to \mathbb{Z})\to (\mathbb{Z}\to \mathbb{Z})\to ([\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu]\to [\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu])\to [\mskip1.5mu \mathbb{Z}+(\mathbb{Z},[\mskip1.5mu ([\mskip1.5mu \mathbb{Z}\mskip1.5mu],\mathbb{Z})\mskip1.5mu])\mskip1.5mu]\to [\mskip1.5mu \mathbb{Z}+(\mathbb{Z},[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu])\mskip1.5mu]}.
 
-2.3. Para finalizar, a álgebra \ensuremath{\Varid{a}} organiza os dados processados na estrutura final, a operação \ensuremath{\Varid{sort}} organiza os nós, enquanto que o \ensuremath{\map \;\Varid{inExp}} converte os elementos numa estrutura do tipo \ensuremath{\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}}.
+2.3. Para finalizar, a álgebra \ensuremath{\Varid{a}} organiza os dados processados na estrutura final, a operação \ensuremath{\Varid{sort}} organiza os nodos, enquanto que o \ensuremath{\map \;\Varid{inExp}} converte os elementos numa estrutura do tipo \ensuremath{\Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}}.
 O seu tipo, neste contexto, é definido como: \ensuremath{\Varid{a}\mathbin{::}[\mskip1.5mu \mathbb{Z}+(\mathbb{Z},[\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu])\mskip1.5mu]\to [\mskip1.5mu \Conid{Exp}\;\mathbb{Z}\;\mathbb{Z}\mskip1.5mu]}.
 
 3. Por fim, a função \ensuremath{\Conid{Term}\;\mathrm{1}} é aplicada para adicionar a raíz da árvore com o valor 1, isto conecta todas as subárvores criadas pela função \ensuremath{\Varid{untar}}, construindo uma única árvore que representa a decomposição de todos os números da lista.
@@ -927,10 +993,37 @@ O seu tipo, neste contexto, é definido como: \ensuremath{\Varid{a}\mathbin{::}[
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{37}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{convolve}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\Varid{convolve}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{convolve}\;\Varid{l1}\;l_2 \mathrel{=}\anaList{\Varid{anaGene}\;\Varid{l1}\;l_2 }\;\mathrm{0}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{anaGene}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Int}\to ()+(\Varid{a},\Conid{Int}){}\<[E]%
+\\
+\>[B]{}\Varid{anaGene}\;\Varid{l1}\;l_2 \mathrel{=}\Varid{cond}\;(\geq \Varid{m}\mathbin{+}\Varid{n}\mathbin{-}\mathrm{1})\;(\underline{\cdot }\mathbin{\$}i_1\;())\;{}\<[E]%
+\\
+\>[B]{}\hsindent{21}{}\<[21]%
+\>[21]{}(\lambda \Varid{i}\to i_2\;(\Varid{sum}{}\<[37]%
+\>[37]{}\mathbin{\$}\Varid{zipWith}\;(\mathbin{*})\;\Varid{l1}\;(\map \;(\lambda \Varid{j}\to \Varid{access}\;(l_2 ,(\Varid{i},\Varid{j})))\;[\mskip1.5mu \mathrm{0}\mathinner{\ldotp\ldotp}(\Varid{m}\mathbin{-}\mathrm{1})\mskip1.5mu]),\Varid{i}\mathbin{+}\mathrm{1})){}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mathbf{where}{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{m}\mathrel{=}\length \;\Varid{l1};\Varid{n}\mathrel{=}\length \;l_2 {}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{access}\mathrel{=}\Varid{cond}\;((\mathrel{\vee})\mathbin{\mathopen{\langle}\$\mathclose{\rangle}}\Varid{cond1}\mathbin{<*>}\Varid{cond2})\;\underline{\mathrm{0}}\;(\uncurry{(\mathbin{!!})}\comp (\Varid{id}\times\uncurry{(\mathbin{-})})){}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{cond1}\mathrel{=}\uncurry{(\mathbin{>})}\comp (\underline{\mathrm{0}}\times\uncurry{(\mathbin{-})}){}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{cond2}\mathrel{=}\uncurry{(\leq )}\comp (\length \times\uncurry{(\mathbin{-})}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -1115,19 +1208,37 @@ Este é definido em Haskell usando as funções \ensuremath{\Varid{cataExpr}} e 
 \end{hscode}\resethooks
 
 \emph{Monad}:
+
+Para declarar \ensuremath{\Conid{Expr}\;\Varid{b}} como instância da classe \ensuremath{\Conid{Monad}}, foram implementadas as intâncias de \ensuremath{\Conid{Functor}}, \ensuremath{\Conid{Applicative}} e \ensuremath{\Conid{Monad}} do tipo \ensuremath{\Conid{Expr}\;\Varid{b}}.
+A abordagem utilizada foi guiada pelo exercício 4 da ficha 12, adaptando ao contexto específico de \ensuremath{\Conid{Expr}\;\Varid{b}}.
+
+Começamos pelo \ensuremath{\Conid{Functor}}, onde a função \ensuremath{\mathsf{fmap}} aplica uma transformação às variáveis da expressão, mantendo as restantes estruturas (\ensuremath{\Conid{N}} e \ensuremath{\Conid{T}}) inalteradas.
+Esta operação é realizada de forma recursiva usando o catamorfismo - \ensuremath{\Varid{cataExpr}} -, que reconstrói a expressão após aplicar a \ensuremath{\Varid{f}} às variáveis.
+A composição com a função \ensuremath{\Varid{inExpr}} e a base do catamorfismo (\ensuremath{\Varid{baseExpr}}) assegura que a estrutura é processada corretamente.
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{6}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{9}{@{}>{\hspre}c<{\hspost}@{}}%
-\column{9E}{@{}l@{}}%
-\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\mathbf{instance}\;\Conid{Functor}\;(\Conid{Expr}\;\Varid{b}){}\<[E]%
 \\
 \>[B]{}\hsindent{6}{}\<[6]%
 \>[6]{}\mathbf{where}\;\mathsf{fmap}\;\Varid{f}\mathrel{=}\Varid{cataExpr}\;(\Varid{inExpr}\comp \Varid{baseExpr}\;\Varid{f}\;\Varid{id}\;\Varid{id}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+De seguida, definimos a instância \ensuremath{\Conid{Applicative}}, onde a função \ensuremath{\Varid{pure}} cria uma expressão com uma variável (\ensuremath{\Conid{V}}) com o valor fornecido,
+a função \ensuremath{\mathbin{<*>}} considera três casos:
+\begin{itemize}
+\item se a expressão é uma variável (\ensuremath{\Conid{V}\;\Varid{f}}), aplica \ensuremath{\mathsf{fmap}} para mapear função sobre a outra expressão;
+\item se a expressão é um número (\ensuremath{\Conid{N}\;\Varid{b}}), mantém o número inalterado;
+\item se a expressão é uma operação (\ensuremath{\Conid{T}\;\Varid{op}\;\Varid{fs}}), aplica a função a cada subexpressão da operação.
+\end{itemize}
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\mathbf{instance}\;\Conid{Applicative}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
@@ -1144,7 +1255,19 @@ Este é definido em Haskell usando as funções \ensuremath{\Varid{cataExpr}} e 
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
 \>[5]{}(\Conid{T}\;\Varid{op}\;\Varid{fs})\mathbin{<*>}\Varid{x}\mathrel{=}\Conid{T}\;\Varid{op}\;(\map \;(\mathbin{<*>}\Varid{x})\;\Varid{fs}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Por fim, a instância \ensuremath{\Conid{Monad}} foi definida, a definição \ensuremath{\Varid{return}} é equivalente a \ensuremath{\Varid{pure}}, cria uma variável.
+A operação \ensuremath{\bind } aplica a função \ensuremath{\Varid{g}} a cada variável da expressão, usando a função auxiliar \ensuremath{\Varid{muExpr}} para processar a expressão resultante.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{9E}{@{}l@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\mathbf{instance}\;\Conid{Monad}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
@@ -1170,15 +1293,105 @@ Este é definido em Haskell usando as funções \ensuremath{\Varid{cataExpr}} e 
 \>[B]{}\Varid{u}\mathrel{=}\Conid{V}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+Provemos que \ensuremath{\Conid{Expr}\;\Varid{b}} é uma instância de \ensuremath{\Conid{Monad}}:
+\begin{itemize}
+\item \ensuremath{\Varid{u}\mathrel{=}\Conid{V}} e \ensuremath{\Conid{V}\mathrel{=}\Varid{inExpr}\comp i_1}, logo \ensuremath{\Varid{u}\mathrel{=}\Varid{inExpr}\comp i_1};
+\item \ensuremath{\Varid{muExpr}\mathrel{=}\Varid{cataExpr}\;\alt{\Varid{id}}{\Varid{inExpr}\comp i_2}}.
+\end{itemize}
+
+Provar a lei monádica Unidade (63):
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{mu}\comp \Varid{u}\mathrel{=}\Varid{mu}\comp \Conid{T}\;\Varid{u}}
+\just\equiv{ definição de mu; definição de u }
+\ensuremath{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \mathbf{in}\comp i_1\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \Conid{T}\;\Varid{u}}
+\just\equiv{ absorção-cata }
+\ensuremath{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \mathbf{in}\comp i_1\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp \Conid{B}\;(\Varid{u},\Varid{id})\,\rrparenthesis}
+\just\equiv{ B(f,g) = f + G g, absorção-+, natural-id, functor-id-F }
+\ensuremath{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \mathbf{in}\comp i_1\mathrel{=}\llparenthesis\, \alt{\Varid{u}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\equiv{ definição de u, cancelamento-cata }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp \Conid{F}\;\Varid{mu}\comp i_1\mathrel{=}\llparenthesis\, \alt{\;\mathbf{in}\comp i_1}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\equiv{ fusão-+, reflexão-+, reflexão-cata, base-cata, B(id, mu) = id + G mu }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp (\Varid{id}\mathbin{+}\Conid{G}\;\Varid{mu})\comp i_1\mathrel{=}\Varid{id}}
+\just\equiv{ natural-i1, natural-id }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp i_1\mathrel{=}\Varid{id}}
+\just\equiv{ cancelamento-+ }
+\ensuremath{\Varid{id}\mathrel{=}\Varid{id}}
+\just\equiv{ P.R.I. }
+\ensuremath{\Conid{True}}
+\qed
+\end{eqnarray*}
+
+Provar a lei monádica Multiplicação (62):
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\Varid{mu}\comp \Conid{T}\;\Varid{mu}}
+\just\equiv{ definição de mu }
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\comp \Conid{T}\;\llparenthesis\, \cdot \,\rrparenthesis\;\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}}
+\just\equiv{ absorção-cata }
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp (\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\mathbin{+}\Conid{G}\;\Varid{id})\,\rrparenthesis}
+\just\equiv{ Functor-id-F, natural-id, absorção-+ }
+\ensuremath{\Varid{mu}\comp \Varid{mu}\mathrel{=}\llparenthesis\, \alt{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\equiv{ definição de mu }
+\ensuremath{\Varid{mu}\comp \llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis\mathrel{=}\llparenthesis\, \alt{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}
+\just\Leftarrow{ fusão-cata }
+\ensuremath{\Varid{mu}\comp \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\mathrel{=}\alt{\llparenthesis\, \alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\,\rrparenthesis}{\;\mathbf{in}\comp i_2}\comp (\Varid{id}\mathbin{+}\Conid{G}\;\Varid{mu})}
+\just\equiv{ fusão-+, absorção-+, natural-id, eq-+ }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp i_1\mathrel{=}\Varid{id}}
+\just\equiv{ cancelamento-+ }
+\ensuremath{\begin{lcbr}\Varid{mu}\mathrel{=}\Varid{mu}\\\Varid{mu}\comp \mathbf{in}\comp i_2\mathrel{=}\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}\end{lcbr}}
+\just\equiv{ p \& True = True, definição de mu, cancelamento-cata, base-cata }
+\ensuremath{\alt{\Varid{id}}{\;\mathbf{in}\comp i_2}\comp (\Varid{id}\mathbin{+}\Conid{G}\;\Varid{mu})\comp i_2\mathrel{=}\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}}
+\just\equiv{ natural-i2, cancelamento-+ }
+\ensuremath{\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}\mathrel{=}\mathbf{in}\comp i_2\comp \Conid{G}\;\Varid{mu}}
+\just\equiv{ P.R.I }
+\ensuremath{\Conid{True}}
+\qed
+\end{eqnarray*}
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
+
+A função \ensuremath{\Varid{let\char95 exp}} é responsável por substituir todas as variáveis numa expressão \ensuremath{\Conid{Expr}} pelas suas correspondentes expressões
+atribuídas por uma função fornecida como argumento.
+
+A definição da função \ensuremath{\Varid{let\char95 exp}} utiliza o catamorfismo \ensuremath{\Varid{cataExpr}}. No caso de encontrar uma variável (\ensuremath{\Conid{V}}), 
+a função \ensuremath{\Varid{f}} é usada para substituir essa variável pela expressão correspondente. Para valores 
+numéricos (\ensuremath{\Conid{N}}), a função mantém o valor inalterado. Para operadores (caso \ensuremath{\Conid{T}}), a função constrói uma nova expressão 
+que combina os resultados das subexpressões recursivamente.
+
+Em suma, \ensuremath{\Varid{let\char95 exp}} avalia uma expressão ao substituir todas as variáveis pelas expressões correspondentes, garantindo 
+que a estrutura da expressão original é mantida. De seguida, o diagrama mostra como a operação do catamorfismo percorre e 
+transforma a expressão.
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\Varid{let\char95 exp}\;\Varid{f}}}
+           \ar@/_/[r]_-{\ensuremath{\Varid{out}}_\ensuremath{\Conid{Expr}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;(\Varid{let\char95 exp}\;\Varid{f})))}}
+           \ar@/_/[l]_-{\ensuremath{\mathbf{in}}_\ensuremath{\Conid{Expr}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+           \ar[l]^-{\ensuremath{\alt{\Varid{f}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}}}
+}
+\end{eqnarray*}
+
+Segue a implementação da função \ensuremath{\Varid{let\char95 exp}}:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{let\char95 exp}\;\Varid{f}\mathrel{=}\Varid{cataExpr}\;\alt{\Varid{f}}{\alt{\Conid{N}}{\uncurry{\Conid{T}}}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
 Catamorfismo monádico:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1194,7 +1407,34 @@ Catamorfismo monádico:
 \>[5]{}\mathbf{where}\;\Varid{aux}\;(\Varid{op},\Varid{ms})\mathrel{=}\mathbf{do}\;\Varid{m}\leftarrow \Varid{lamb}\;\Varid{ms};(\Varid{return}\comp i_2\comp i_2)\;(\Varid{op},\Varid{return}\;\Varid{m}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+
 Avaliação de expressões:
+
+A função \ensuremath{\Varid{evaluate}} avalia expressões do tipo \ensuremath{\Conid{Expr}} e retorna o resultado da avaliação com o tipo \ensuremath{\Conid{Maybe}}.
+Esta função tem em conta dois cenários de erro: variáveis não instanciadas e operadores aplicados a um número incorreto de argumentos.
+
+A função \ensuremath{\Varid{evaluate}} utiliza o catamorfismo \ensuremath{\Varid{mcataExpr}} para avaliar a expressão. Este conceito generaliza o conceito de catamorfismo simples para permitir trabalhar em contextos monádicos.
+O ponto central deste conceito é que combina a lógica de transformação (\ensuremath{\Varid{g}}) com a recursão da estrutura, enquanto lida automaticamente com contextos monádicos. Assim, evitámos
+tratar manualmente de cada contexto monádico \ensuremath{\Conid{Maybe}} em cada passo.
+
+No caso do \ensuremath{\Varid{evaluate}}, o gene \ensuremath{\Varid{gene}} define como é que se processa cada nodo da estrutura \ensuremath{\Conid{Expr}}.
+O gene \ensuremath{\Varid{gene}} lida com três casos principais:
+\begin{itemize}
+\item \ensuremath{\Conid{V}} : Para uma variável, retornámos \ensuremath{\Conid{Nothing}}, porque as variávis não podem ser avaliadas.
+\item \ensuremath{\Conid{N}} : Para um número, retornámos o próprio número com \ensuremath{\Conid{Just}}.
+\item \ensuremath{\Conid{T}} : Para um operador, utilizámos a função auxiliar \ensuremath{\Varid{aux}} que:
+    \begin{itemize}
+        \item avalia todos os argumentos no contexto \ensuremath{\Conid{Maybe}}, isto é, verifica se todos os argumentos são válidos;
+        \item aplica a função \ensuremath{\Varid{result}} para calcular o resultado final, caso todos os argumentos sejam válidos.
+    \end{itemize}
+\end{itemize}
+
+A função \ensuremath{\Varid{result}} define o comportamento esperado para cada operados e valida a aridade, assim garante que apenas os operadores com a aridade correta sejam avaliados.
+Caso contrário, a avaliação falha e retorna \ensuremath{\Conid{Nothing}}.
+
+Segue a implementação da função \ensuremath{\Varid{evaluate}}:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1210,15 +1450,15 @@ Avaliação de expressões:
 \\[\blanklineskip]%
 \>[B]{}\Varid{result}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Conid{Op}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Maybe}\;\Varid{a}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Add}\mathrel{=}\Conid{Just}\comp \Varid{sum}{}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Add}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\Varid{y}){}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Mul}\mathrel{=}\Conid{Just}\comp \Varid{product}{}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Mul}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{*}\Varid{y}){}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Suc}\mathrel{=}\Conid{Just}\comp (\mathbin{+}\mathrm{1})\comp \Varid{head}{}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Suc}\;[\mskip1.5mu \Varid{x}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\mathrm{1}){}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{ITE}\mathrel{=}\Conid{Just}\comp \Varid{cond}\;(\uncurry{(\mathbin{>})}\comp \conj{\Varid{head}}{\underline{\mathrm{0}}})\;(\uncurry{(\mathbin{!!})}\comp \conj{\Varid{id}}{\underline{\mathrm{1}}})\;(\uncurry{(\mathbin{!!})}\comp \conj{\Varid{id}}{\underline{\mathrm{2}}}){}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{ITE}\;[\mskip1.5mu \Varid{cond},\Varid{t},\Varid{f}\mskip1.5mu]\mathrel{=}\mathbf{if}\;\Varid{cond}\not\equiv \mathrm{0}\;\mathbf{then}\;\Conid{Just}\;\Varid{t}\;\mathbf{else}\;\Conid{Just}\;\Varid{f}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\anonymous \mathrel{=}\underline{\Conid{Nothing}}{}\<[E]%
+\>[B]{}\Varid{result}\;\anonymous \;\anonymous \mathrel{=}\Conid{Nothing}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

@@ -181,7 +181,6 @@ import Data.Ratio
 import Control.Concurrent
 import Data.List (find)
 import BTree (hyloBTree, qsep)
-import Text.XHtml (paragraph)
 
 main = undefined
 \end{code}
@@ -567,13 +566,77 @@ que sejam necessárias.
 
 \subsection*{Problema 1}
 
+A função |hindex| foi implementada como um hilomorfismo de |BTree| (|hyloBTree|), visto que o problema assemelha-se ao processo de ordenação |qsort|,
+que também utiliza um hilomorfismo. A ideia principal foi usar a partição de elementos como o |qSort| usa e adaptar o restante processo para calcular o h-index.
+
+A função |hindex| é representada pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Integer|^*
+           \ar[d]_-{|ana qsep|}
+           \ar[r]^-{| qsep |}
+&
+    |Either 1 (Integer, (Integer|^*|, Integer|^*|))|
+           \ar[d]^{|id + id >< ((ana qsep) >< (ana qsep))|}
+\\
+    |BTree Integer|
+           \ar[d]_-{|cataNat f|}
+           \ar@@/_/[r]_-{|out|}
+&
+    |Either 1 (Integer,(BTree Integer,BTree Integer))|
+           \ar[d]^{|id + id >< ((cata f) >< (cata f))|}
+           \ar@@/_/[l]_-{|in|}
+\\
+    |(Integer, Integer|^*|)|
+&
+    |Either 1 (Integer, ((Integer, Integer|^*|), (Integer, Integer|^*|)))|
+           \ar[l]^-{|f = either (const (0, [])) hI|}
+}
+\end{eqnarray*}
+
+Esta função é composta por um anamorfismo (|anaBTree qsep|) e por um catamorfismo (|cataBTree (either (const (0, [])) hI)|).
+
+\textbf{1. Anamorfismo}
+
+A função |qsep| é responsável por dividir a lista de alturas do histograma e construir recursivamente a árvore binária.
+Assim, caso a lista esteja vazia, retorna |i1()|.
+
+Caso contrário, o primeiro elemento da lista é escolhido como pivô e os elementos restantes são divididos em dois subconjuntos: |s| contém os elementos menores que o pivô e |l| contém os elementos maiores ou iguais ao pivô.
+Esta divisão é realizada pela função |part| que percorre a lista e verifica, para cada elemento, se este satisfaz o predicado |p|, no caso da função |qsep|, se é menor que o pivô.
+
+Então, o resultado da função |qsep| é uma árvore binária onde cada nodo contém um pivô e as suas subárvores representam os valores menores e maiores, respetivamente.
+
+\textbf{2. Catamorfismo}
+
+O catamorfismo |cataBTree (either (const (0, [])) hI)| verifica se o nodo é vazio e retorna |(0, [])|.
+Caso contrário, aplica a função |hI| que calcula o h-index e os contribuidores para o nodo atual.
+
+A função |hI| segue os seguintes passos:
+
+\textbf{2.1. Combinação dos valores das subárvores:} junta os valores das subárvores esquerda e direita numa lista, adicionando o valor do nodo atual.
+
+\textbf{2.2. Cálculo do h-index:} cada elemento da lista é emparelhado com a sua posição usando |zip [1..] list|, a função |myfoldr| percorre esses pares para calcular o maior índice |k| tal que o valor associado seja maior ou igual a |k|.
+Ou seja, a lista |list| é transformada em pares |(k, height)|, onde |k| representa a posição e |height| é o alor da altura correspondente. A função |process| verifica:
+\begin{itemize}
+    \item Se |height >= k|, então o h-index é atualizado para o máximo entre o valor atual e |k|.
+    \item Caso contrário, o h-index mantém-se inalterado.
+\end{itemize}
+A função |process|:
+\begin{itemize}
+    \item verifica se a altura é maior ou igual ao índice: |uncurry (>=).swap.p1|;
+    \item se a condição for satisfeita, atualiza o h-index: |uncurry max . swap . (p1 >< id)|;
+    \item caso contrário, mantém o valor atual: |p2|.
+\end{itemize}
+
+\textbf{2.3. Identificação dos contribuidores:} a lista é filtrada para conter apenas os valores maiores ou iguais ao h-index (|filter (>= hIndex) list|).
+
+Segue a implementação da função |hindex|:
 \begin{code}
-hindex = hyloBTree (either f1 f2) qsep
+hindex = hyloBTree (either (const (0, [])) hI) qsep
 
-f1 = const (0, [])
-
-f2 :: (Int, ((Int, [Int]), (Int, [Int]))) -> (Int, [Int])
-f2 (n, ((_, ll), (_, lr))) = (hIndex, contributors)
+hI :: (Int, ((Int, [Int]), (Int, [Int]))) -> (Int, [Int])
+hI (n, ((_, ll), (_, lr))) = (hIndex, contributors)
     where
         list = lr ++ [n] ++ ll
         hIndex = myfoldr (curry process) 0 (zip [1..] list)
@@ -584,23 +647,25 @@ f2 (n, ((_, ll), (_, lr))) = (hIndex, contributors)
 
 \subsection*{Problema 2}
 
-A função primes é responsável por criar a lista de fatores primos de um dado número. De modo que, esta função pode ser definida
+Primeira parte:
+
+A função |primes| é responsável por criar a lista de fatores primos de um dado número. De modo que, esta função pode ser definida
 como um anamorfismo de listas (|List|). Assim, o diagrama que representa a operação é o seguinte:
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
     |Integer|
            \ar[d]_-{|anaList g|}
-            \ar[r]_-{|g|} 
+            \ar[r]^-{|g|} 
 &
     |1 + Integer| \times |Integer|
            \ar[d]^{|id + (id| \times |anaList g|)}
 \\
      |Integer|^*
-            \ar[r]_-{|outList|} 
+            \ar@@/_/[r]_-{|out|_|List|} 
 &
      |1 + Integer| \times |Integer|^*
-           \ar[l]_-{|inList|}
+           \ar@@/_/[l]_-{|in|_|List|}
 }
 \end{eqnarray*}
 
@@ -649,7 +714,6 @@ pode ser decomposto de forma única como um produto de fatores primos.
 O processo descrito no gene |g| utiliza esta propriedade para decompor iterativamente o |n| nos seus fatores primos,
 onde a divisibilidade é verificada e avançamos na procura do menor fator primo.
 
-Primeira parte:
 \begin{code}
 
 smallestPrimeFactor x = for (\n -> cond (uncurry (>) . ((^2) >< id)) p2
@@ -661,10 +725,11 @@ g n = i2 (smallestPrimeFactor n, div n (smallestPrimeFactor n))
 primes = anaList g
 \end{code}
 
+Segunda parte:
+
 A função |prime_tree| é responsável por criar a árvore dos primos de uma lista de inteiros, como se encontra ilustrado no enunciado.
 De modo que, esta função pode ser definida da seguinte forma:
 
-Segunda parte:
 \begin{code}
 prime_tree = Term 1 . untar . map (\n -> (primes n, n))
 \end{code}
@@ -678,16 +743,16 @@ Explicação da função |prime_tree|:
 1. A função |primes| é aplicada a cada elemento da lista de inteiros e com o uso da expressão |map (\n -> (primes n, n))|, obtemos uma lista de pares, onde o primeiro elemento é a lista de fatores primos de um número e o segundo elemento é o próprio número.
 Assim, no final da execução desta expressão, obtemos uma lista de pares do tipo |[([Integer], Integer)]|.
 
-2. Neste contexto, a função |untar| converte os fatores primos de um número e o próprio número numa representação de árvore onde os nós intermediários são os fatores e as folhas são os números originais, |[Exp Integer Integer]|.
+2. Neste contexto, a função |untar| converte os fatores primos de um número e o próprio número numa representação de árvore onde os nodos intermediários são os fatores e as folhas são os números originais, |[Exp Integer Integer]|.
 Esta conversão é realizada em três partes principais: a coalgebra, a base e a álgebra.
 
 2.1. A coalgebra, representada pela função |c|, é responsável por decompor os dados, ou seja, separa os pares da lista inicial - |[([Integer], Integer)]| - e transforma cada elemento para o formato |Either Integer (Integer, [([Integer], Integer)])|.
 
-2.1.1. O |map((p2-!-assocr).distl.(outList >< id))| é aplicado a cada par da lista, onde:
+2.1.1. O |map((p2 + assocr).distl.(outList >< id))| é aplicado a cada par da lista, onde:
     \begin{itemize}
         \item |outList >< id| transforma a lista de fatores primos num tipo |Either| e retorna o número original. Permitindo tratar em separado os fatores primos e os números. 
         \item |distl| distribui os elementos |Either (a, b)| para o tipo |(Either a b, b)|, separa os dados para facilitar o processamento posterior.
-        \item |p2-!-assocr| reorganiza os pares para agrupar corretamente os fatores primos associados a um número.
+        \item |p2 + assocr| reorganiza os pares para agrupar corretamente os fatores primos associados a um número.
     \end{itemize}
 
 2.1.2. |sep| percorre a lista de elementos |Either|, e separa os elementos |Left| para o primeiro grupo e os |Right| para o segundo grupo.
@@ -702,7 +767,7 @@ Então, os números que partilham o mesmo fator primo são agrupados juntos.
 |base :: (Integer -> Integer) -> (Integer -> Integer) -> ([([Integer], Integer)] -> [Exp Integer Integer]) 
  -> [Either Integer (Integer, [([Integer], Integer)])] -> [Either Integer (Integer, [Exp Integer Integer])]|.
 
-2.3. Para finalizar, a álgebra |a| organiza os dados processados na estrutura final, a operação |sort| organiza os nós, enquanto que o |map inExp| converte os elementos numa estrutura do tipo |Exp Integer Integer|.
+2.3. Para finalizar, a álgebra |a| organiza os dados processados na estrutura final, a operação |sort| organiza os nodos, enquanto que o |map inExp| converte os elementos numa estrutura do tipo |Exp Integer Integer|.
 O seu tipo, neste contexto, é definido como: | a :: [Either Integer (Integer, [Exp Integer Integer])] -> [Exp Integer Integer]|.
 
 3. Por fim, a função |Term 1| é aplicada para adicionar a raíz da árvore com o valor 1, isto conecta todas as subárvores criadas pela função |untar|, construindo uma única árvore que representa a decomposição de todos os números da lista.
@@ -711,7 +776,17 @@ O seu tipo, neste contexto, é definido como: | a :: [Either Integer (Integer, [
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
-convolve = undefined
+convolve l1 l2 = anaList (anaGene l1 l2) 0
+
+anaGene :: Num a => [a] -> [a] -> Int -> Either () (a, Int)
+anaGene l1 l2 = cond (>= m + n - 1) (const $ i1 ())
+                    (\i -> i2 (sum  $ zipWith (*) l1 (map (\j -> access (l2, (i, j))) [0..(m - 1)]), i + 1))
+    where
+        m = length l1; n = length l2
+        access = cond ((||) <$> cond1 <*> cond2) (const 0) (uncurry (!!) . (id >< uncurry (-)))
+        cond1 = uncurry (>).(const 0 >< uncurry (-))
+        cond2 = uncurry (<=).(length >< uncurry (-))
+
 \end{code}
 
 \subsection*{Problema 4}
@@ -928,10 +1003,30 @@ hyloExpr h g = cataExpr h . anaExpr g
 \end{code}
 
 \emph{Monad}:
+
+Para declarar |Expr b| como instância da classe |Monad|, foram implementadas as intâncias de |Functor|, |Applicative| e |Monad| do tipo |Expr b|.
+A abordagem utilizada foi guiada pelo exercício 4 da ficha 12, adaptando ao contexto específico de |Expr b|.
+
+Começamos pelo |Functor|, onde a função |fmap| aplica uma transformação às variáveis da expressão, mantendo as restantes estruturas (|N| e |T|) inalteradas.
+Esta operação é realizada de forma recursiva usando o catamorfismo - |cataExpr| -, que reconstrói a expressão após aplicar a |f| às variáveis.
+A composição com a função |inExpr| e a base do catamorfismo (|baseExpr|) assegura que a estrutura é processada corretamente.
+
 \begin{code}
 
 instance Functor (Expr b)
      where fmap f = cataExpr (inExpr . baseExpr f id id)
+
+\end{code}
+
+De seguida, definimos a instância |Applicative|, onde a função |pure| cria uma expressão com uma variável (|V|) com o valor fornecido,
+a função |<*>| considera três casos:
+\begin{itemize}
+\item se a expressão é uma variável (|V f|), aplica |fmap| para mapear função sobre a outra expressão;
+\item se a expressão é um número (|N b|), mantém o número inalterado;
+\item se a expressão é uma operação (|T op fs|), aplica a função a cada subexpressão da operação.
+\end{itemize}
+
+\begin{code}
 
 instance Applicative (Expr b) where
     pure :: a -> Expr b a
@@ -939,6 +1034,13 @@ instance Applicative (Expr b) where
     (V f) <*> x = fmap f x
     (N b) <*> _ = N b
     (T op fs) <*> x = T op (map (<*> x) fs)
+
+\end{code}
+
+Por fim, a instância |Monad| foi definida, a definição |return| é equivalente a |pure|, cria uma variável.
+A operação |>>=| aplica a função |g| a cada variável da expressão, usando a função auxiliar |muExpr| para processar a expressão resultante.
+
+\begin{code}
 
 instance Monad (Expr b) where
     return :: a -> Expr b a
@@ -954,12 +1056,146 @@ u :: a -> Expr b a
 u = V
 
 \end{code}
+
+Provemos que |Expr b| é uma instância de |Monad|:
+\begin{itemize}
+\item |u = V| e |V = inExpr . i1|, logo |u = inExpr . i1|;
+\item |muExpr = cataExpr (either id (inExpr . i2))|.
+\end{itemize}
+
+Provar a lei monádica Unidade (63):
+\begin{eqnarray*}
+\start
+|
+	mu . u = mu . T u
+|
+\just\equiv{ definição de mu; definição de u }
+|
+    cata (either id (in . i2)) . in . i1 = cata (either id (in . i2)) . T u
+|
+\just\equiv{ absorção-cata }
+|
+    cata (either id (in . i2)) . in . i1 = cata (either id (in . i2) . B(u,id))
+|
+\just\equiv{ B(f,g) = f + G g, absorção-+, natural-id, functor-id-F }
+|
+    cata (either id (in . i2)) . in . i1 = cata (either u (in.i2))
+|
+\just\equiv{ definição de u, cancelamento-cata }
+|
+    either id (in . i2) . F mu . i1 = cata (either (in.i1) (in.i2))
+|
+\just\equiv{ fusão-+, reflexão-+, reflexão-cata, base-cata, B(id, mu) = id + G mu }
+|
+    either id (in . i2) . (id + G mu) . i1 = id
+|
+\just\equiv{ natural-i1, natural-id }
+|
+    either id (in . i2) . i1 = id
+|
+\just\equiv{ cancelamento-+ }
+|
+    id = id
+|
+\just\equiv{ P.R.I. }
+|
+    True
+|
+\qed
+\end{eqnarray*}
+
+Provar a lei monádica Multiplicação (62):
+\begin{eqnarray*}
+\start
+|
+	mu . mu = mu . T mu
+|
+\just\equiv{ definição de mu }
+|
+    mu.mu = cata (either id (in . i2)) . T cata (either id (in . i2))
+|
+\just\equiv{ absorção-cata }
+|
+    mu.mu = cata (either id (in . i2) . (cata (either id (in.i2)) + G id))
+|
+\just\equiv{ Functor-id-F, natural-id, absorção-+ }
+|
+    mu.mu = cata (either (cata (either id (in.i2))) (in.i2))
+|
+\just\equiv{ definição de mu }
+|
+    mu.cata (either id (in.i2)) = cata (either (cata (either id (in.i2))) (in.i2))
+|
+\just\Leftarrow{ fusão-cata }
+|
+    mu. either id (in.i2) = either (cata (either id (in.i2))) (in.i2) . (id + G mu)
+|
+\just\equiv{ fusão-+, absorção-+, natural-id, eq-+ }
+|
+    either id (in . i2) . i1 = id
+|
+\just\equiv{ cancelamento-+ }
+|
+    lcbr(
+          mu = mu
+     )(
+          mu . in . i2 = in . i2 . G mu
+     )
+|
+\just\equiv{ p \& True = True, definição de mu, cancelamento-cata, base-cata }
+|
+    either id (in . i2) . (id + G mu) . i2 = in . i2 . G mu
+|
+\just\equiv{ natural-i2, cancelamento-+ }
+|
+    in . i2 . G mu = in . i2 . G mu
+|
+\just\equiv{ P.R.I }
+|
+    True
+|
+\qed
+\end{eqnarray*}
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
+
+A função |let_exp| é responsável por substituir todas as variáveis numa expressão |Expr| pelas suas correspondentes expressões
+atribuídas por uma função fornecida como argumento.
+
+A definição da função |let_exp| utiliza o catamorfismo |cataExpr|. No caso de encontrar uma variável (|V|), 
+a função |f| é usada para substituir essa variável pela expressão correspondente. Para valores 
+numéricos (|N|), a função mantém o valor inalterado. Para operadores (caso |T|), a função constrói uma nova expressão 
+que combina os resultados das subexpressões recursivamente.
+
+Em suma, |let_exp| avalia uma expressão ao substituir todas as variáveis pelas expressões correspondentes, garantindo 
+que a estrutura da expressão original é mantida. De seguida, o diagrama mostra como a operação do catamorfismo percorre e 
+transforma a expressão.
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C A|
+           \ar[d]_-{|let_exp f|}
+           \ar@@/_/[r]_-{|out|_|Expr|}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (let_exp f)))|}
+           \ar@@/_/[l]_-{|in|_|Expr|}
+\\
+    |Expr C B|
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|either f (either N (uncurry T))|}
+}
+\end{eqnarray*}
+
+Segue a implementação da função |let_exp|:
+
 \begin{code}
 let_exp f = cataExpr (either f (either N (uncurry T)))
 \end{code}
+
 Catamorfismo monádico:
 \begin{code}
 mcataExpr g = g .! (dl' . recExpr (mcataExpr g) . outExpr)
@@ -968,7 +1204,34 @@ dl' :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, 
 dl' = either (return . i1) (either (return . i2 . i1) aux)
     where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
 \end{code}
+
+
 Avaliação de expressões:
+
+A função |evaluate| avalia expressões do tipo |Expr| e retorna o resultado da avaliação com o tipo |Maybe|.
+Esta função tem em conta dois cenários de erro: variáveis não instanciadas e operadores aplicados a um número incorreto de argumentos.
+
+A função |evaluate| utiliza o catamorfismo |mcataExpr| para avaliar a expressão. Este conceito generaliza o conceito de catamorfismo simples para permitir trabalhar em contextos monádicos.
+O ponto central deste conceito é que combina a lógica de transformação (|g|) com a recursão da estrutura, enquanto lida automaticamente com contextos monádicos. Assim, evitámos
+tratar manualmente de cada contexto monádico |Maybe| em cada passo.
+
+No caso do |evaluate|, o gene |gene| define como é que se processa cada nodo da estrutura |Expr|.
+O gene |gene| lida com três casos principais:
+\begin{itemize}
+\item |V| : Para uma variável, retornámos |Nothing|, porque as variávis não podem ser avaliadas.
+\item |N| : Para um número, retornámos o próprio número com |Just|.
+\item |T| : Para um operador, utilizámos a função auxiliar |aux| que:
+    \begin{itemize}
+        \item avalia todos os argumentos no contexto |Maybe|, isto é, verifica se todos os argumentos são válidos;
+        \item aplica a função |result| para calcular o resultado final, caso todos os argumentos sejam válidos.
+    \end{itemize}
+\end{itemize}
+
+A função |result| define o comportamento esperado para cada operados e valida a aridade, assim garante que apenas os operadores com a aridade correta sejam avaliados.
+Caso contrário, a avaliação falha e retorna |Nothing|.
+
+Segue a implementação da função |evaluate|:
+
 \begin{code}
 evaluate = mcataExpr gene
 
@@ -977,11 +1240,11 @@ gene = either (const Nothing) (either Just aux)
     where aux (op, args) = do argsR <- args; result op argsR
 
 result :: (Num a, Ord a) => Op -> [a] -> Maybe a
-result Add = Just . sum
-result Mul = Just . product
-result Suc = Just . (+1) . head
-result ITE = Just . cond (uncurry (>) . split head (const 0)) (uncurry (!!) . split id (const 1)) (uncurry (!!) . split id (const 2))
-result _ = const Nothing
+result Add [x, y] = Just (x + y)
+result Mul [x, y] = Just (x * y)
+result Suc [x] = Just (x + 1)
+result ITE [cond, t, f] = if cond /= 0 then Just t else Just f
+result _ _ = Nothing
 
 \end{code}
 
