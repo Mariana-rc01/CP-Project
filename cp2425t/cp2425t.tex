@@ -1393,7 +1393,43 @@ Provar a lei monádica Multiplicação (62):
 }
 \end{eqnarray*}
 
-Para definir o catamorfismo monádico de \ensuremath{\Conid{Expr}}, a função \ensuremath{\Varid{mcataExpr}}, começamos por definir a função \ensuremath{\Varid{dl'}}, que é responsável por transformar a estrutura de \ensuremath{\Conid{Expr}} para um contexto monádico.
+Para definir o catamorfismo monádico de \ensuremath{\Conid{Expr}}, a função \ensuremath{\Varid{mcataExpr}}, começamos por entender o papel fundamental da função \ensuremath{\Varid{dl}}, que é responsável por transformar a estrutura de \ensuremath{\Conid{Expr}} num contexto monádico. Esta transformação permite que o processamento das expressões ocorra dentro de um monad.
+
+A função \ensuremath{\Varid{dl}} é definida como:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{dl}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{a}+(\Varid{b}+(\Conid{Op},[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]))\to \Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]))){}\<[E]%
+\\
+\>[B]{}\Varid{dl}\mathrel{=}\alt{\Varid{return}\comp i_1}{\alt{\Varid{return}\comp i_2\comp i_1}{\Varid{aux}}}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mathbf{where}\;\Varid{aux}\;(\Varid{op},\Varid{ms})\mathrel{=}\mathbf{do}\;\Varid{m}\leftarrow \Varid{lamb}\;\Varid{ms};(\Varid{return}\comp i_2\comp i_2)\;(\Varid{op},\Varid{return}\;\Varid{m}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+- No caso de um valor do tipo \ensuremath{\Varid{a}}, a função simplesmente o encapsula no monad utilizando \ensuremath{\Varid{return}\comp i_1}.
+
+- No caso de um valor do tipo \ensuremath{\Varid{b}}, o mesmo ocorre, utilizando \ensuremath{\Varid{return}\comp i_2\comp i_1}.
+
+- No caso de uma operação (\ensuremath{\Conid{Op}}) acompanhada por uma lista de valores monádicos (\ensuremath{[\mskip1.5mu \Varid{m}\;\Varid{c}\mskip1.5mu]}), é usada a função auxiliar \ensuremath{\Varid{aux}}.
+
+Dentro de \ensuremath{\Varid{aux}}, a função \ensuremath{\Varid{lamb}} é utilizada para distribuir o monad pela lista. Em seguida, o resultado é encapsulado novamente na estrutura esperada pelo tipo \ensuremath{\Varid{m}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu])))}.
+
+A função \ensuremath{\Varid{mcataExpr}}, que define o catamorfismo monádico propriamente dito, é então definida da seguinte forma:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{mcataExpr}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow (\Varid{a}+(\Varid{b}+(\Conid{Op},\Varid{m}\;[\mskip1.5mu \Varid{c}\mskip1.5mu]))\to \Varid{m}\;\Varid{c})\to \Conid{Expr}\;\Varid{b}\;\Varid{a}\to \Varid{m}\;\Varid{c}{}\<[E]%
+\\
+\>[B]{}\Varid{mcataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\mathbin{.!}(\Varid{dl}\comp \Varid{recExpr}\;(\Varid{mcataExpr}\;\Varid{g})\comp \Varid{outExpr}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Esta definição, assemelha-se à definição do catamorfismo simples, com a diferença de que a função \ensuremath{\Varid{dl}} é usada para distribuir o monad sobre a lista de subexpressões.
 
 4.
 \emph{Maps}:

@@ -1200,7 +1200,36 @@ Provar a lei monádica Multiplicação (62):
 }
 \end{eqnarray*}
 
-Para definir o catamorfismo monádico de |Expr|, a função |mcataExpr|, começamos por definir a função |dl'|, que é responsável por transformar a estrutura de |Expr| para um contexto monádico.
+Para definir o catamorfismo monádico de |Expr|, a função |mcataExpr|, começamos por entender o papel fundamental da função |dl|, que é responsável por transformar a estrutura de |Expr| num contexto monádico. Esta transformação permite que o processamento das expressões ocorra dentro de um monad.
+
+A função |dl| é definida como:
+
+\begin{code}
+
+dl :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
+dl = either (return . i1) (either (return . i2 . i1) aux)
+    where aux (op, ms) = do m <- lamb ms; (return . i2 . i2) (op, return m)
+
+\end{code}
+
+- No caso de um valor do tipo |a|, a função simplesmente o encapsula no monad utilizando |return . i1|.
+
+- No caso de um valor do tipo |b|, o mesmo ocorre, utilizando |return . i2 . i1|.
+
+- No caso de uma operação (|Op|) acompanhada por uma lista de valores monádicos (|[m c]|), é usada a função auxiliar |aux|.
+
+Dentro de |aux|, a função |lamb| é utilizada para distribuir o monad pela lista. Em seguida, o resultado é encapsulado novamente na estrutura esperada pelo tipo |m (Either a (Either b (Op, m [c])))|.
+
+A função |mcataExpr|, que define o catamorfismo monádico propriamente dito, é então definida da seguinte forma:
+
+\begin{code}
+
+mcataExpr :: Monad m => (Either a (Either b (Op, m [c])) -> m c) -> Expr b a -> m c
+mcataExpr g = g .! (dl . recExpr (mcataExpr g) . outExpr)
+
+\end{code}
+
+Esta definição, assemelha-se à definição do catamorfismo simples, com a diferença de que a função |dl| é usada para distribuir o monad sobre a lista de subexpressões.
 
 4.
 \emph{Maps}:
