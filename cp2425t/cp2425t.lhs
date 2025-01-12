@@ -716,9 +716,11 @@ convolve = undefined
 
 \subsection*{Problema 4}
 
+1. Nesta pergunta, pretende-se definir por completo, a biblioteca |Expr|, à semelhança das outras bibliotecas de estruturas fornecidas.
+
 Definição do tipo de |Expr|:
 
-Cálculo de outExpr:
+Para o cálulo de |outExpr|, partimos da afirmação |outExpr . inExpr = id|,
 
 \begin{eqnarray*}
 \start
@@ -798,7 +800,7 @@ recExpr = baseExpr id id
 
 \end{code}
 
-\emph{Ana + cata + hylo}:
+Definição da triologia ana-cata-hylo:
 
 Começando pelo catamorfismo de |Expr|, temos:
 
