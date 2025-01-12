@@ -789,7 +789,7 @@ Sabendo que |F f = B(id, f)|, temos que:
 |
 \end{eqnarray*}
 
-Definindo |recExpr| como:
+Definindo, então, |recExpr| como:
 
 \begin{code}
 
@@ -865,11 +865,11 @@ Representado pelo seguinte diagrama:
     |A + (C + (Op >< (Expr C A)|^*))
            \ar@@/^-1pc/[l]_-{|inNat |}
 \\
-    |Expr C B|
+    |Expr C D|
             \ar[u]^-{|ana g|}
             \ar[r]_-{|g|}
 &
-    |A + (C + (Op >< (Expr C B)|^*))
+    |A + (C + (Op >< (Expr C D)|^*))
             \ar[u]_-{|id + (id + (id >< map (ana g)))|}
 }
 \end{eqnarray*}
@@ -882,11 +882,49 @@ anaExpr g = inExpr . recExpr (anaExpr g) . g
 
 \end{code}
 
+Sendo o hilomorfismo, a composição do catamorfismo e do anamorfismo, representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Expr C D|
+           \ar[d]_-{|ana g|}
+           \ar[r]_-{| g |}
+&
+    |A + (C + (Op >< (Expr C D)|^*))
+           \ar[d]^{|id + (id + (id >< map (ana g)))|}
+\\
+    |Expr C A|
+           \ar[d]_-{|cataNat h|}
+           \ar@@/^-1pc/[r]_-{| out |}
+&
+    |A + (C + (Op >< (Expr C A)|^*))
+           \ar[d]^{|id + (id + (id >< map (cataNat h)))|}
+           \ar@@/^-1pc/[l]_-{|inNat |}
+\\
+    |Expr C B|
+&
+    |A + (C + (Op >< (Expr C B)|^*))
+           \ar[l]^-{|h|}
+}
+\end{eqnarray*}
+
+ou seja,
+
+\begin{eqnarray*}
+\start
+|
+    hylo h g = cata h . ana g
+|
+\end{eqnarray*}
+
+Este é definido em Haskell usando as funções |cataExpr| e |anaExpr| previamente definidas:
+
 \begin{code}
                 
 hyloExpr h g = cataExpr h . anaExpr g
 
 \end{code}
+
 \emph{Monad}:
 \begin{code}
 

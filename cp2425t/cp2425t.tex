@@ -981,7 +981,7 @@ Sabendo que \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Conid{B}\;(\Varid{id},\V
 \ensuremath{\Conid{F}\;\Varid{f}\mathrel{=}\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}\Varid{id}\times\map \;\Varid{f})}
 \end{eqnarray*}
 
-Definindo \ensuremath{\Varid{recExpr}} como:
+Definindo, então, \ensuremath{\Varid{recExpr}} como:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1052,11 +1052,11 @@ Representado pelo seguinte diagrama:
     \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
            \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
 \\
-    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{D}}
             \ar[u]^-{\ensuremath{\ana{\Varid{g}}}}
             \ar[r]_-{\ensuremath{\Varid{g}}}
 &
-    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{D})}^*))
             \ar[u]_-{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\ana{\Varid{g}}))}}
 }
 \end{eqnarray*}
@@ -1070,12 +1070,48 @@ Utilizando as funções previamente definidas, temos então:
 \ColumnHook
 \end{hscode}\resethooks
 
+Sendo o hilomorfismo, a composição do catamorfismo e do anamorfismo, representado pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{D}}
+           \ar[d]_-{\ensuremath{\ana{\Varid{g}}}}
+           \ar[r]_-{\ensuremath{\Varid{g}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{D})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\ana{\Varid{g}}))}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
+           \ar[d]_-{\ensuremath{\cataNat{\Varid{h}}}}
+           \ar@/^-1pc/[r]_-{\ensuremath{\Varid{out}}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;\cataNat{\Varid{h}}))}}
+           \ar@/^-1pc/[l]_-{\ensuremath{\mathsf{in}}}
+\\
+    \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
+&
+    \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{B})}^*))
+           \ar[l]^-{\ensuremath{\Varid{h}}}
+}
+\end{eqnarray*}
+
+ou seja,
+
+\begin{eqnarray*}
+\start
+\ensuremath{\llbracket\, \Varid{h},\,\Varid{g}\,\rrbracket\mathrel{=}\llparenthesis\, \Varid{h}\,\rrparenthesis\comp \ana{\Varid{g}}}
+\end{eqnarray*}
+
+Este é definido em Haskell usando as funções \ensuremath{\Varid{cataExpr}} e \ensuremath{\Varid{anaExpr}} previamente definidas:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{hyloExpr}\;\Varid{h}\;\Varid{g}\mathrel{=}\Varid{cataExpr}\;\Varid{h}\comp \Varid{anaExpr}\;\Varid{g}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
 \emph{Monad}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
