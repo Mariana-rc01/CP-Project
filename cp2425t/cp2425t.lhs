@@ -181,7 +181,6 @@ import Data.Ratio
 import Control.Concurrent
 import Data.List (find)
 import BTree (hyloBTree, qsep)
-import Text.XHtml (paragraph)
 
 main = undefined
 \end{code}
@@ -597,10 +596,10 @@ como um anamorfismo de listas (|List|). Assim, o diagrama que representa a opera
            \ar[d]^{|id + (id| \times |anaList g|)}
 \\
      |Integer|^*
-            \ar[r]_-{|outList|} 
+            \ar@@/_/[r]_-{|out|_|List|} 
 &
      |1 + Integer| \times |Integer|^*
-           \ar[l]_-{|inList|}
+           \ar@@/_/[l]_-{|in|_|List|}
 }
 \end{eqnarray*}
 
@@ -892,6 +891,10 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
+\emph{Maps}:
+\emph{Monad}:
+\emph{Let expressions}:
+
 A função |let_exp| é responsável por substituir todas as variáveis numa expressão |Expr| pelas suas correspondentes expressões
 atribuídas por uma função fornecida como argumento.
 
@@ -908,11 +911,11 @@ transforma a expressão.
 \xymatrix@@C=2cm{
     |Expr C A|
            \ar[d]_-{|let_exp f|}
-           \ar[r]_-{|outExpr|}
+           \ar@@/_/[r]_-{|out|_|Expr|}
 &
     |A + (C + (Op >< (Expr C A)|^*))
            \ar[d]^{|id + (id + (id >< map (let_exp f)))|}
-           \ar[l]_-{|inExpr|}
+           \ar@@/_/[l]_-{|in|_|Expr|}
 \\
     |Expr C B|
 &
@@ -921,9 +924,7 @@ transforma a expressão.
 }
 \end{eqnarray*}
 
-\emph{Maps}:
-\emph{Monad}:
-\emph{Let expressions}:
+
 \begin{code}
 let_exp f = cataExpr (either f (either N (uncurry T)))
 \end{code}
@@ -939,6 +940,29 @@ dl' = either (return . i1) (either (return . i2 . i1) aux)
 
 
 Avaliação de expressões:
+
+A função |evaluate| avalia expressões do tipo |Expr| e retorna o resultado da avaliação com o tipo |Maybe|.
+Esta função tem em conta dois cenários de erro: variáveis não instanciadas e operadores aplicados a um número incorreto de argumentos.
+
+A função |evaluate| utiliza o catamorfismo |mcataExpr| para avaliar a expressão. Este conceito generaliza o conceito de catamorfismo simples para permitir trabalhar em contextos monádicos.
+O ponto central deste conceito é que combina a lógica de transformação (|g|) com a recursão da estrutura, enquanto lida automaticamente com contextos monádicos. Assim, evitámos
+tratar manualmente de cada contexto monádico |Maybe| em cada passo.
+
+No caso do |evaluate|, o gene |gene| define como é que se processa cada nó da estrutura |Expr|.
+O gene |gene| lida com três casos principais:
+\begin{itemize}
+\item |V| : Para uma variável, retornamos |Nothing|, porque as variávis não podem ser avaliadas.
+\item |N| : Para um número, retornámos o próprio número com |Just|.
+\item |T| : Para um operador, utilizámos a função auxiliar |aux| que:
+    \begin{itemize}
+        \item avalia todos os argumentos no contexto |Maybe|, isto é, verifica se todos os argumentos são válidos;
+        \item aplica a função |result| para calcular o resultado final, caso todos os argumentos sejam válidos.
+    \end{itemize}
+\end{itemize}
+
+A função |result| define o comportamento esperado para cada operados e valida a aridade, assim garante que apenas os operadores com a aridade correta sejam avaliados.
+Caso contrário, a avaliação falha e retorna |Nothing|.
+
 \begin{code}
 evaluate = mcataExpr gene
 
@@ -947,11 +971,11 @@ gene = either (const Nothing) (either Just aux)
     where aux (op, args) = do argsR <- args; result op argsR
 
 result :: (Num a, Ord a) => Op -> [a] -> Maybe a
-result Add = Just . sum
-result Mul = Just . product
-result Suc = Just . (+1) . head
-result ITE = Just . cond (uncurry (>) . split head (const 0)) (uncurry (!!) . split id (const 1)) (uncurry (!!) . split id (const 2))
-result _ = const Nothing
+result Add [x, y] = Just (x + y)
+result Mul [x, y] = Just (x * y)
+result Suc [x] = Just (x + 1)
+result ITE [cond, t, f] = if cond /= 0 then Just t else Just f
+result _ _ = Nothing
 
 \end{code}
 

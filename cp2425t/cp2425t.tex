@@ -805,10 +805,10 @@ como um anamorfismo de listas (\ensuremath{\Conid{List}}). Assim, o diagrama que
            \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
 \\
      \ensuremath{\mathbb{Z}}^*
-            \ar[r]_-{\ensuremath{\Varid{outList}}} 
+            \ar@/_/[r]_-{\ensuremath{\Varid{out}}_\ensuremath{\Conid{List}}} 
 &
      \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}^*
-           \ar[l]_-{\ensuremath{\Varid{inList}}}
+           \ar@/_/[l]_-{\ensuremath{\mathbf{in}}_\ensuremath{\Conid{List}}}
 }
 \end{eqnarray*}
 
@@ -1106,6 +1106,10 @@ Provar a lei monádica Multiplicação (62):
 \qed
 \end{eqnarray*}
 
+\emph{Maps}:
+\emph{Monad}:
+\emph{Let expressions}:
+
 A função \ensuremath{\Varid{let\char95 exp}} é responsável por substituir todas as variáveis numa expressão \ensuremath{\Conid{Expr}} pelas suas correspondentes expressões
 atribuídas por uma função fornecida como argumento.
 
@@ -1122,11 +1126,11 @@ transforma a expressão.
 \xymatrix@C=2cm{
     \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{A}}
            \ar[d]_-{\ensuremath{\Varid{let\char95 exp}\;\Varid{f}}}
-           \ar[r]_-{\ensuremath{\Varid{outExpr}}}
+           \ar@/_/[r]_-{\ensuremath{\Varid{out}}_\ensuremath{\Conid{Expr}}}
 &
     \ensuremath{\Conid{A}\mathbin{+}(\Conid{C}\mathbin{+}(\Conid{Op}\times(\Conid{Expr}\;\Conid{C}\;\Conid{A})}^*))
            \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\mathbin{+}(\Varid{id}\times\map \;(\Varid{let\char95 exp}\;\Varid{f})))}}
-           \ar[l]_-{\ensuremath{\Varid{inExpr}}}
+           \ar@/_/[l]_-{\ensuremath{\mathbf{in}}_\ensuremath{\Conid{Expr}}}
 \\
     \ensuremath{\Conid{Expr}\;\Conid{C}\;\Conid{B}}
 &
@@ -1135,9 +1139,7 @@ transforma a expressão.
 }
 \end{eqnarray*}
 
-\emph{Maps}:
-\emph{Monad}:
-\emph{Let expressions}:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1163,6 +1165,29 @@ Catamorfismo monádico:
 
 
 Avaliação de expressões:
+
+A função \ensuremath{\Varid{evaluate}} avalia expressões do tipo \ensuremath{\Conid{Expr}} e retorna o resultado da avaliação com o tipo \ensuremath{\Conid{Maybe}}.
+Esta função tem em conta dois cenários de erro: variáveis não instanciadas e operadores aplicados a um número incorreto de argumentos.
+
+A função \ensuremath{\Varid{evaluate}} utiliza o catamorfismo \ensuremath{\Varid{mcataExpr}} para avaliar a expressão. Este conceito generaliza o conceito de catamorfismo simples para permitir trabalhar em contextos monádicos.
+O ponto central deste conceito é que combina a lógica de transformação (\ensuremath{\Varid{g}}) com a recursão da estrutura, enquanto lida automaticamente com contextos monádicos. Assim, evitámos
+tratar manualmente de cada contexto monádico \ensuremath{\Conid{Maybe}} em cada passo.
+
+No caso do \ensuremath{\Varid{evaluate}}, o gene \ensuremath{\Varid{gene}} define como é que se processa cada nó da estrutura \ensuremath{\Conid{Expr}}.
+O gene \ensuremath{\Varid{gene}} lida com três casos principais:
+\begin{itemize}
+\item \ensuremath{\Conid{V}} : Para uma variável, retornamos \ensuremath{\Conid{Nothing}}, porque as variávis não podem ser avaliadas.
+\item \ensuremath{\Conid{N}} : Para um número, retornámos o próprio número com \ensuremath{\Conid{Just}}.
+\item \ensuremath{\Conid{T}} : Para um operador, utilizámos a função auxiliar \ensuremath{\Varid{aux}} que:
+    \begin{itemize}
+        \item avalia todos os argumentos no contexto \ensuremath{\Conid{Maybe}}, isto é, verifica se todos os argumentos são válidos;
+        \item aplica a função \ensuremath{\Varid{result}} para calcular o resultado final, caso todos os argumentos sejam válidos.
+    \end{itemize}
+\end{itemize}
+
+A função \ensuremath{\Varid{result}} define o comportamento esperado para cada operados e valida a aridade, assim garante que apenas os operadores com a aridade correta sejam avaliados.
+Caso contrário, a avaliação falha e retorna \ensuremath{\Conid{Nothing}}.
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1178,15 +1203,15 @@ Avaliação de expressões:
 \\[\blanklineskip]%
 \>[B]{}\Varid{result}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Conid{Op}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Maybe}\;\Varid{a}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Add}\mathrel{=}\Conid{Just}\comp \Varid{sum}{}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Add}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\Varid{y}){}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Mul}\mathrel{=}\Conid{Just}\comp \Varid{product}{}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Mul}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{*}\Varid{y}){}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{Suc}\mathrel{=}\Conid{Just}\comp (\mathbin{+}\mathrm{1})\comp \Varid{head}{}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{Suc}\;[\mskip1.5mu \Varid{x}\mskip1.5mu]\mathrel{=}\Conid{Just}\;(\Varid{x}\mathbin{+}\mathrm{1}){}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\Conid{ITE}\mathrel{=}\Conid{Just}\comp \Varid{cond}\;(\uncurry{(\mathbin{>})}\comp \conj{\Varid{head}}{\underline{\mathrm{0}}})\;(\uncurry{(\mathbin{!!})}\comp \conj{\Varid{id}}{\underline{\mathrm{1}}})\;(\uncurry{(\mathbin{!!})}\comp \conj{\Varid{id}}{\underline{\mathrm{2}}}){}\<[E]%
+\>[B]{}\Varid{result}\;\Conid{ITE}\;[\mskip1.5mu \Varid{cond},\Varid{t},\Varid{f}\mskip1.5mu]\mathrel{=}\mathbf{if}\;\Varid{cond}\not\equiv \mathrm{0}\;\mathbf{then}\;\Conid{Just}\;\Varid{t}\;\mathbf{else}\;\Conid{Just}\;\Varid{f}{}\<[E]%
 \\
-\>[B]{}\Varid{result}\;\anonymous \mathrel{=}\underline{\Conid{Nothing}}{}\<[E]%
+\>[B]{}\Varid{result}\;\anonymous \;\anonymous \mathrel{=}\Conid{Nothing}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
