@@ -108,11 +108,11 @@ geneM = either (const Nothing) (either Just aux)
 
 -- Função em comum para as duas resoluções
 result :: (Num a, Ord a) => Op -> [a] -> Maybe a
-result Add = Just . sum
-result Mul = Just . product
-result Suc = Just . (+1) . head
-result ITE = Just . cond (uncurry (>) . split head (const 0)) (uncurry (!!) . split id (const 1)) (uncurry (!!) . split id (const 2))
-result _ = const Nothing
+result Add [x, y] = Just (x + y)
+result Mul [x, y] = Just (x * y)
+result Suc [x] = Just (x + 1)
+result ITE [cond, t, f] = if cond /= 0 then Just t else Just f
+result _ _ = Nothing
 
 g "x" = N 0
 g "y" = N (1%7)
