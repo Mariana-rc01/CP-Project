@@ -991,6 +991,35 @@ O seu tipo, neste contexto, é definido como: \ensuremath{\Varid{a}\mathbin{::}[
 
 \subsection*{Problema 3}
 
+A função \ensuremath{\Varid{convolve}} foi implementada como um anamorfismo de listas (\ensuremath{\Conid{List}}), já que a função é responsável por criar a lista resultante da convolução de 2 listas fornecidas, \ensuremath{\Varid{l1}} e \ensuremath{l_2 }.
+Esta vai construindo recursivamente a lista resultado recorrendo à função \ensuremath{\anaList{\cdot }}, aplicando sucessivamente  às duas listas o gene \ensuremath{\Varid{g}} que, neste caso, está realmente construído na função \ensuremath{\Varid{anaGene}}.
+
+A função \ensuremath{\Varid{anaGene}} começa por verificar se o índice \ensuremath{\Varid{i}} (inicialmente 0) ainda se encontra dentro dos limites da convolução, isto é, se \ensuremath{\Varid{i}\geq \Varid{m}\mathbin{+}\Varid{n}\mathbin{-}\mathrm{1}}. Se isto se verificar, será retornada uma lista vazia, visto que a convolução terminou, não sendo adicionado nenhum valor novo à lista final.
+Caso contrário, será calculado o elemento seguinte da lista resultado, realizando efetivamente o próximo passo da convolução: \ensuremath{\Varid{sum}\mathbin{\$}\Varid{zipWith}\;(\mathbin{*})\;\Varid{l1}\;(\map \;(\lambda \Varid{j}\to \Varid{access}\;(l_2 ,(\Varid{i},\Varid{j})))\;[\mskip1.5mu \mathrm{0}\mathinner{\ldotp\ldotp}(\Varid{m}\mathbin{-}\mathrm{1})\mskip1.5mu])}
+
+Além disso, neste cálculo, é verificado se o índice \ensuremath{\Varid{i}\mathbin{-}\Varid{j}} de \ensuremath{l_2 } é válido, através da função \ensuremath{\Varid{access}}, onde duas condições são confirmadas: \ensuremath{\Varid{i}\mathbin{-}\Varid{j}} tem de ser não negativo (\ensuremath{\uncurry{(\mathbin{>})}\comp (\underline{\mathrm{0}}\times\uncurry{(\mathbin{-})})}) e menor que o comprimento de \ensuremath{l_2 } (\ensuremath{\uncurry{(\leq )}\comp (\length \times\uncurry{(\mathbin{-})})}).
+
+A função \ensuremath{\Varid{convolve}} é representada pelo seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\mathbb{Z}}^* \times \ensuremath{\mathbb{Z}}^*
+           \ar[d]_-{\ensuremath{\anaList{\Varid{g}}}}
+            \ar[r]^-{\ensuremath{\Varid{g}}} 
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times (\ensuremath{\mathbb{Z}}^* \times \ensuremath{\mathbb{Z}}^*)
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}} \times \ensuremath{\anaList{\Varid{g}}})}
+\\
+     \ensuremath{\mathbb{Z}}^*
+            \ar@/_/[r]_-{\ensuremath{\Varid{out}}_\ensuremath{\Conid{List}}} 
+&
+     \ensuremath{\mathrm{1}\mathbin{+}\mathbb{Z}} \times \ensuremath{\mathbb{Z}}^*
+           \ar@/_/[l]_-{\ensuremath{\mathbf{in}}_\ensuremath{\Conid{List}}}
+}
+\end{eqnarray*}
+
+A implementação da função \ensuremath{\Varid{convolve}} realizada foi a seguinte:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
